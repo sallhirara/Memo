@@ -25,6 +25,35 @@
             display: none;
         }
 
+        body.dark-mode {
+        --primary-color: #fff;
+        --secondary-color: #444;
+        --background-color: #333;
+        --font-color: #eee;
+        }
+
+        body.dark-mode {
+            background-color: var(--background-color);
+            color: var(--font-color);
+        }
+
+        body.dark-mode #summary,
+        body.dark-mode .memo-title,
+        body.dark-mode .event-icon {
+            background-color: var(--background-color);
+            color: var(--font-color);
+        }
+
+        body.dark-mode .event-content {
+            background-color: var(--secondary-color);
+        }
+
+        body.dark-mode .event-dot,
+        body.dark-mode .timeline-line {
+            background-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
         body {
             font-family: var(--font-family);
             height: 100vh;
@@ -582,7 +611,6 @@
 
 
         // ViewMode切り替え
-
         let editModeActive = false;
 
         function toggleEditMode() {
@@ -614,7 +642,25 @@
                     icon.classList.toggle('hidden', editModeActive);
                 });
             });
+
+            adjustTimelineLine(); 
         }
+
+
+        
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const currentTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+            localStorage.setItem('theme', currentTheme);
+        }
+    
+        // Load the saved theme from local storage
+        window.addEventListener('load', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme && savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
+        });
 
 
         // Dot and Line adjustment
