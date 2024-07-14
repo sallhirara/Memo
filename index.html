@@ -13,18 +13,29 @@
             padding: 0;
         }
 
+        :root {
+            --primary-color: #333;
+            --secondary-color: lightgrey;
+            --font-family: 'Arial, Helvetica, sans-serif';
+            --font-size-base: 16px;
+            --font-size-large: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
         body {
-            font-family: Arial, Helvetica, sans-serif;
-            max-width: 445px;
-            margin: auto;
+            font-family: var(--font-family);
             height: 100vh;
             padding: 5px;
             line-height: 1.6;
-            font-size: 16px;
+            font-size: var(--font-size-base);
+            max-width: 445px;
+            margin: auto;
         }
 
         header {
-            font-size: 18px;
             text-align: center;
             margin: 20px;
         }
@@ -40,6 +51,9 @@
             top: 100vh;
             top: 100dvh;
             font-size: 12px;
+            font-family: var(--font-family);
+            color: var(--font-color);
+            text-align: center;
         }
 
         #summary {
@@ -49,13 +63,16 @@
             padding: 5px;
             border: none;
             border-radius: 5px;
+            font-family: var(--font-family);
+            color: var(--font-color);
         }
 
         #addMemo {
-            border: none;
+            margin-bottom: 20px 0;
             font-size: 24px;
-            color: #333;
+            border: none;
             background-color: transparent;
+            color: var(--primary-color);
         }
 
         .control-buttons {
@@ -117,7 +134,7 @@
         .event-dot {
             width: 10px;
             height: 10px;
-            background-color: #333;
+            background-color: var(--primary-color);
             border-radius: 50%;
             margin-right: 5px;
         }
@@ -125,23 +142,32 @@
         .timeline-line {
             position: absolute;
             width: 4px;
-            background-color: #333;
+            background-color: var(--primary-color);
             z-index: -1;
             margin-left: 0px;
         }
 
         .memo-title {
+            font-family: 'Arial, Helvetica, sans-serif';
             text-align: left;
             padding: 5px;
             font-size: 18px;
             flex-grow: 1;
             cursor: text;
             border: none;
+            border-radius: 5px;
         }
 
         .event-content > * {
             font-size: 16px;
-            margin: 5px 10px 0 0;
+            margin: 5px 5px 0 0;
+        }
+
+        .event-content input[type="text"], 
+        .event-content textarea {
+            border: none;
+            border-radius: 5px;
+            background-color: var(--secondary-color);
         }
 
         .custom-quill-editor .ql-editor {
@@ -155,10 +181,6 @@
 
         .ql-snow .ql-tooltip {
             z-index: 10000;
-        }
-
-        .event-content {
-            overflow: visible;
         }
 
         .custom-quill-editor {
@@ -177,7 +199,7 @@
             margin: 5px 10px 5px 55px;
             padding: 10px;
             border-radius: 5px;
-            background-color: lightgrey;
+            background-color: var(--secondary-color);
         }
 
         .delete-icon {
@@ -198,15 +220,7 @@
             margin-left: 10px;
         }
 
-        footer {
-            position: sticky;
-            top: 100vh;
-            top: 100dvh;
-            font-size: 12px;
-            font-family: "SF Pro Text", "Myriad Set Pro", "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
-            color: rgba(0, 0, 0, 0.56);
-            text-align: center;
-        }
+
     </style>
 </head>
 <body>
@@ -223,6 +237,8 @@
         <div class="control-buttons">
             <button id="toggle-all-events" onclick="toggleAllEvents()"><i class="fa fa-angle-double-down"></i></button>
             <button id="save-button" onclick="saveMemo()"><i class="fa fa-save"></i></button>
+            <button id="share-button" onclick="shareEvents()"><i class="fa fa-share-alt"></i></button>
+            <button id="toggle-view" onclick="toggleEditMode()"><i class="fa fa-eye"></i></button>            
             <button id="undo-button" onclick="undo()"><i class="fa fa-undo"></i></button>
             <button id="toggle-theme" onclick="toggleTheme()"><i class="fa fa-adjust"></i></button>
         </div>
@@ -337,6 +353,8 @@
             contentWrapper.style.display = 'block';
             contentWrapper.style.alignItems = 'center';
             contentWrapper.style.width = '100%';
+            contentWrapper.style.fontSize = '16px';
+                
             const deleteIcon = document.createElement('span');
             deleteIcon.classList.add('delete-icon');
             deleteIcon.innerHTML = '<i class="fa-solid fa-minus"></i>';
@@ -344,6 +362,11 @@
                 container.removeChild(contentWrapper);
                 adjustTimelineLine(); // 要素が削除されたときに呼び出し
             };
+        
+            // 動的に追加される要素にhiddenクラスを適用
+            if (editModeActive) {
+                deleteIcon.classList.add('hidden');
+            }
         
             switch (type) {
                 case 'textbox':
@@ -427,8 +450,15 @@
                 default:
                     contentWrapper.innerHTML = '';
             }
+        
             contentWrapper.appendChild(deleteIcon);
             container.appendChild(contentWrapper);
+        
+            // toggle-viewの状態を確認し、必要ならば非表示にする
+            if (editModeActive) {
+                deleteIcon.classList.add('hidden');
+            }
+        
             adjustTimelineLine(); // 要素が追加されたときに呼び出し
         }
     
@@ -448,7 +478,9 @@
             }
             adjustTimelineLine();
         }
-    
+
+
+        // 前開閉
         function toggleAllEvents() {
             const eventContents = document.querySelectorAll('.event-content');
             const eventIcons = document.querySelectorAll('.event-icon');
@@ -484,7 +516,9 @@
     
             adjustTimelineLine(); // Adjust the timeline line after toggling all events
         }
-    
+        
+
+        // ローカルストレージ保存・リロード
         function saveMemo() {
             const events = document.querySelectorAll('.event');
             const memoData = [];
@@ -547,6 +581,43 @@
         }
 
 
+        // ViewMode切り替え
+
+        let editModeActive = false;
+
+        function toggleEditMode() {
+            editModeActive = !editModeActive;
+
+            const addMemoButton = document.getElementById('addMemo');
+            const deleteIcons = document.querySelectorAll('.delete-icon');
+            const addContentIcons = document.querySelectorAll('.add-content-icon');
+            const selectMenus = document.querySelectorAll('select');
+
+            addMemoButton.classList.toggle('hidden', editModeActive);
+
+            deleteIcons.forEach(icon => {
+                icon.classList.toggle('hidden', editModeActive);
+            });
+        
+            addContentIcons.forEach(icon => {
+                icon.classList.toggle('hidden', editModeActive);
+            });
+        
+            selectMenus.forEach(menu => {
+                menu.classList.toggle('hidden', editModeActive);
+            });
+        
+            const eventContents = document.querySelectorAll('.event-content');
+            eventContents.forEach(content => {
+                const deleteIconsInContent = content.querySelectorAll('.delete-icon');
+                deleteIconsInContent.forEach(icon => {
+                    icon.classList.toggle('hidden', editModeActive);
+                });
+            });
+        }
+
+
+        // Dot and Line adjustment
         function adjustTimelineLine() {
             const eventList = document.querySelector('.event-list');
             const events = document.querySelectorAll('.event');
