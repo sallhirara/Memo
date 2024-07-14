@@ -26,10 +26,10 @@
         }
 
         body.dark-mode {
-        --primary-color: #fff;
-        --secondary-color: #444;
-        --background-color: #333;
-        --font-color: #eee;
+        --primary-color: #ddd;
+        --secondary-color: #333;
+        --background-color: #222;
+        --font-color: #ddd;
         }
 
         body.dark-mode {
@@ -190,6 +190,7 @@
         .event-content > * {
             font-size: 16px;
             margin: 5px 5px 0 0;
+            color: var(--font-color);
         }
 
         .event-content input[type="text"], 
@@ -197,11 +198,12 @@
             border: none;
             border-radius: 5px;
             background-color: var(--secondary-color);
+            color: var(--font-color);
         }
 
         .custom-quill-editor .ql-editor {
             font-size: 12px;
-            background-color: aliceblue;
+            background-color: var(--background-color);
         }
 
         .ql-tooltip {
@@ -438,7 +440,7 @@
                     quillContainer.style.overflow = 'visible'; // コンテナのオーバーフローを隠さない
                     const quillEditor = document.createElement('div');
                     quillEditor.classList.add('custom-quill-editor'); // カスタムクラスを追加
-                    quillEditor.style.height = 'auto'; // 高さを自動に設定
+                    quillEditor.style.height = 'auto';
                     quillContainer.appendChild(quillEditor);
                     contentWrapper.appendChild(quillContainer);
                 
