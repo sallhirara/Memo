@@ -231,118 +231,122 @@
 
   
     <script>
-    const menuButton = document.getElementById("menuButton");
-    const menuScreen = document.getElementById("menuContainer");
-    let isDragging = false;
-    let offsetX, offsetY;
 
-    // 初期位置設定
-    function setInitialPosition() {
-      const screenWidth = window.innerWidth;
-      const screenHeight = window.innerHeight;
-      menuButton.style.left = screenWidth - menuButton.offsetWidth - "px";
-      menuButton.style.top = screenHeight - menuButton.offsetHeight - "px";
-    }
+      // ページロード時にダークモードを適用
+      document.body.classList.add('dark-mode');
 
-    setInitialPosition();
+      const menuButton = document.getElementById("menuButton");
+      const menuScreen = document.getElementById("menuContainer");
+      let isDragging = false;
+      let offsetX, offsetY;
 
-    // メニュースクリーンの中心をメニューボタンの中心に合わせる
-    menuButton.addEventListener("click", () => {
-      const buttonRect = menuButton.getBoundingClientRect();
-      const centerTop = buttonRect.top + buttonRect.height / 2;
-      menuScreen.style.top = `${centerTop}px`;
-      menuScreen.style.left = "50%";
-      menuScreen.style.display = menuScreen.style.display === "none" ? "flex" : "none";
-    });
-
-    // 画面リサイズ時の位置調整
-    window.addEventListener("resize", () => {
-      const rect = menuButton.getBoundingClientRect();
-      const screenWidth = window.innerWidth;
-      const screenHeight = window.innerHeight;
-
-      // ボタンが画面内に収まるように再配置
-      menuButton.style.left = Math.min(screenWidth - rect.width, parseFloat(menuButton.style.left)) + "px";
-      menuButton.style.top = Math.min(screenHeight - rect.height, parseFloat(menuButton.style.top)) + "px";
-    });
-
-    // PCのマウスイベント
-    menuButton.addEventListener("mousedown", (e) => {
-      startDrag(e.clientX, e.clientY);
-      document.addEventListener("mousemove", onDrag);
-    });
-
-    document.addEventListener("mouseup", endDrag);
-
-    // モバイルのタッチイベント
-    menuButton.addEventListener("touchstart", (e) => {
-      const touch = e.touches[0];
-      startDrag(touch.clientX, touch.clientY);
-      document.addEventListener("touchmove", onDrag);
-    });
-
-    document.addEventListener("touchend", endDrag);
-
-    function startDrag(clientX, clientY) {
-      isDragging = true;
-      offsetX = clientX - menuButton.getBoundingClientRect().left;
-      offsetY = clientY - menuButton.getBoundingClientRect().top;
-    }
-
-    function onDrag(e) {
-      if (isDragging) {
-        e.preventDefault();
-
-        let clientX = e.clientX || e.touches[0].clientX;
-        let clientY = e.clientY || e.touches[0].clientY;
-
-        let x = clientX - offsetX;
-        let y = clientY - offsetY;
-        
-        // 画面内の範囲に制限
+      // 初期位置設定
+      function setInitialPosition() {
         const screenWidth = window.innerWidth;
         const screenHeight = window.innerHeight;
-        const buttonWidth = menuButton.offsetWidth;
-        const buttonHeight = menuButton.offsetHeight;
-
-        x = Math.max(0, Math.min(screenWidth - buttonWidth, x));
-        y = Math.max(0, Math.min(screenHeight - buttonHeight, y));
-
-        menuButton.style.left = x + "px";
-        menuButton.style.top = y + "px";
-        menuButton.style.position = "fixed";
+        menuButton.style.left = screenWidth - menuButton.offsetWidth - "px";
+        menuButton.style.top = screenHeight - menuButton.offsetHeight - "px";
       }
-    }
 
-    function endDrag() {
-      if (isDragging) {
-        isDragging = false;
-        document.removeEventListener("mousemove", onDrag);
-        document.removeEventListener("touchmove", onDrag);
-        
-        // 画面の端に吸着させる
+      setInitialPosition();
+
+      // メニュースクリーンの中心をメニューボタンの中心に合わせる
+      menuButton.addEventListener("click", () => {
+        const buttonRect = menuButton.getBoundingClientRect();
+        const centerTop = buttonRect.top + buttonRect.height / 2;
+        menuScreen.style.top = `${centerTop}px`;
+        menuScreen.style.left = "50%";
+        menuScreen.style.display = menuScreen.style.display === "none" ? "flex" : "none";
+      });
+
+      // 画面リサイズ時の位置調整
+      window.addEventListener("resize", () => {
         const rect = menuButton.getBoundingClientRect();
         const screenWidth = window.innerWidth;
         const screenHeight = window.innerHeight;
 
-        const toLeft = rect.left;
-        const toRight = screenWidth - rect.right;
-        const toTop = rect.top;
-        const toBottom = screenHeight - rect.bottom;
+        // ボタンが画面内に収まるように再配置
+        menuButton.style.left = Math.min(screenWidth - rect.width, parseFloat(menuButton.style.left)) + "px";
+        menuButton.style.top = Math.min(screenHeight - rect.height, parseFloat(menuButton.style.top)) + "px";
+      });
 
-        const minDistance = Math.min(toLeft, toRight, toTop, toBottom);
+      // PCのマウスイベント
+      menuButton.addEventListener("mousedown", (e) => {
+        startDrag(e.clientX, e.clientY);
+        document.addEventListener("mousemove", onDrag);
+      });
 
-        if (minDistance === toLeft) {
-          menuButton.style.left = "0px";
-        } else if (minDistance === toRight) {
-          menuButton.style.left = screenWidth - rect.width + "px";
-        } else if (minDistance === toTop) {
-          menuButton.style.top = "0px";
-        } else if (minDistance === toBottom) {
-          menuButton.style.top = screenHeight - rect.height + "px";
+      document.addEventListener("mouseup", endDrag);
+
+      // モバイルのタッチイベント
+      menuButton.addEventListener("touchstart", (e) => {
+        const touch = e.touches[0];
+        startDrag(touch.clientX, touch.clientY);
+        document.addEventListener("touchmove", onDrag);
+      });
+
+      document.addEventListener("touchend", endDrag);
+
+      function startDrag(clientX, clientY) {
+        isDragging = true;
+        offsetX = clientX - menuButton.getBoundingClientRect().left;
+        offsetY = clientY - menuButton.getBoundingClientRect().top;
+      }
+
+      function onDrag(e) {
+        if (isDragging) {
+          e.preventDefault();
+
+          let clientX = e.clientX || e.touches[0].clientX;
+          let clientY = e.clientY || e.touches[0].clientY;
+
+          let x = clientX - offsetX;
+          let y = clientY - offsetY;
+          
+          // 画面内の範囲に制限
+          const screenWidth = window.innerWidth;
+          const screenHeight = window.innerHeight;
+          const buttonWidth = menuButton.offsetWidth;
+          const buttonHeight = menuButton.offsetHeight;
+
+          x = Math.max(0, Math.min(screenWidth - buttonWidth, x));
+          y = Math.max(0, Math.min(screenHeight - buttonHeight, y));
+
+          menuButton.style.left = x + "px";
+          menuButton.style.top = y + "px";
+          menuButton.style.position = "fixed";
         }
       }
-    }
+
+      function endDrag() {
+        if (isDragging) {
+          isDragging = false;
+          document.removeEventListener("mousemove", onDrag);
+          document.removeEventListener("touchmove", onDrag);
+          
+          // 画面の端に吸着させる
+          const rect = menuButton.getBoundingClientRect();
+          const screenWidth = window.innerWidth;
+          const screenHeight = window.innerHeight;
+
+          const toLeft = rect.left;
+          const toRight = screenWidth - rect.right;
+          const toTop = rect.top;
+          const toBottom = screenHeight - rect.bottom;
+
+          const minDistance = Math.min(toLeft, toRight, toTop, toBottom);
+
+          if (minDistance === toLeft) {
+            menuButton.style.left = "0px";
+          } else if (minDistance === toRight) {
+            menuButton.style.left = screenWidth - rect.width + "px";
+          } else if (minDistance === toTop) {
+            menuButton.style.top = "0px";
+          } else if (minDistance === toBottom) {
+            menuButton.style.top = screenHeight - rect.height + "px";
+          }
+        }
+      }
 
 
       // メニューボタンを円形に配置
