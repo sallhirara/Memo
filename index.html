@@ -242,10 +242,11 @@
 
       // 初期位置設定
       function setInitialPosition() {
+        const margin = 10;
         const screenWidth = window.innerWidth;
         const screenHeight = window.innerHeight;
-        menuButton.style.left = screenWidth - menuButton.offsetWidth - "px";
-        menuButton.style.top = screenHeight - menuButton.offsetHeight - "px";
+        menuButton.style.left = `${margin}px`;
+        menuButton.style.top = `${margin}px`;
       }
 
       setInitialPosition();
@@ -332,6 +333,8 @@
         }
       }
 
+      const margin = 10;
+
       function endDrag() {
         if (isDragging) {
           isDragging = false;
@@ -351,13 +354,13 @@
           const minDistance = Math.min(toLeft, toRight, toTop, toBottom);
 
           if (minDistance === toLeft) {
-            menuButton.style.left = "0px";
+            menuButton.style.left = `${margin}px`;
           } else if (minDistance === toRight) {
-            menuButton.style.left = screenWidth - rect.width + "px";
+            menuButton.style.left = `${screenWidth - rect.width - margin}px`;
           } else if (minDistance === toTop) {
-            menuButton.style.top = "0px";
+            menuButton.style.top = `${margin}px`;
           } else if (minDistance === toBottom) {
-            menuButton.style.top = screenHeight - rect.height + "px";
+            menuButton.style.top = `${screenHeight - rect.height - margin}px`;
           }
         }
       }
@@ -374,8 +377,8 @@
           const angle = (2 * Math.PI * index) / buttons.length - Math.PI / 2; // 12時位置からスタート
           const x = radius * Math.cos(angle);
           const y = radius * Math.sin(angle);
-          button.style.left = `calc(50% + ${x}px - ${button.offsetWidth / 2}px)`;  // ボタンの中心調整
-          button.style.top = `calc(50% + ${y}px - ${button.offsetHeight / 2}px)`;  // ボタンの中心調整
+          button.style.left = `calc(50% + ${x}px - ${button.offsetWidth + 50/ 2}px)`;  // ボタンの中心調整
+          button.style.top = `calc(50% + ${y}px - ${button.offsetHeight + 50/ 2}px)`;  // ボタンの中心調整
         });
 
         // メニューボタンの中心位置にメニューコンテナを配置
