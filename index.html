@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -389,8 +390,13 @@
 
         menuButton.addEventListener('click', () => {
         menuContainer.classList.toggle('open');
-        });
+        });  
+      });
 
+      document.addEventListener("click", (event) => {
+        if (!menuScreen.contains(event.target) && !menuButton.contains(event.target)) {
+            menuScreen.style.display = "none";
+        }
       });
 
       // Dark mode
