@@ -2,698 +2,442 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0", viewport-fit=cover>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.quilljs.com/1.3.6/quill.snow.css">
-    <title>Memo</title>
+    <link rel="stylesheet" href="https://cdn.quilljs.com/1.3.6/quill.bubble.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+  
+    <title>Sticky Memo</title>
+    <link rel="stylesheet" href="styles.css"> <!-- 外部CSSファイルのリンク -->
+
+    <!--▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽-->
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+      }     
 
-        :root {
-            --primary-color: #333;
-            --secondary-color: lightgrey;
-            --font-family: 'Arial, Helvetica, sans-serif';
-            --font-size-base: 16px;
-            --font-size-large: 20px;
-        }
+      :root {
+        --bg-color: #ffffff;
+        --text-color: #333;
+      }
+      
+      .dark-mode {
+        --bg-color: #222;
+        --text-color: #ffffff;
+      }
 
-        .hidden {
-            display: none;
-        }
+      button {
+        font-size: 23px;
+        border: none;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        transition: background-color 0.3s, color 0.3s;        
+      }
+      
+      #menuButton { /* or .assistive-touch*/
+        position: fixed;
+        width: 50px;
+        height: 50px;
+        background-color: rgba(0, 0, 0, 0.7);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        position: fixed;
+        z-index: 1000;
+        transition: background-color 0.3s;
+      }
 
-        body.dark-mode {
-        --primary-color: #ddd;
-        --secondary-color: #333;
-        --background-color: #222;
-        --font-color: #ddd;
-        }
+      #menuButton:hover {
+        background-color: rgba(0, 0, 0, 0.9)
+      }
 
-        body.dark-mode {
-            background-color: var(--background-color);
-            color: var(--font-color);
-        }
+      .circle {
+        width: 30px;
+        height: 30px;
+        background-color: white;
+        border-radius: 50%;
+      }
 
-        body.dark-mode #summary,
-        body.dark-mode .memo-title,
-        body.dark-mode .event-icon {
-            background-color: var(--background-color);
-            color: var(--font-color);
-        }
+      .menuContainer {
+        display: none;
+        position: fixed;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 300px;
+        height: 300px;
+        background-color: rgba(0, 0, 0, 0.8);
+        border-radius: 10%;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        border: 1px solid red;
+        transition: transform 0.5s ease;
+        z-index: 1000;
+      }
 
-        body.dark-mode .event-content {
-            background-color: var(--secondary-color);
-        }
-
-        body.dark-mode .event-dot,
-        body.dark-mode .timeline-line {
-            background-color: var(--primary-color);
-            color: var(--primary-color);
-        }
-
-        body {
-            font-family: var(--font-family);
-            height: 100vh;
-            padding: 5px;
-            line-height: 1.6;
-            font-size: var(--font-size-base);
-            max-width: 445px;
-            margin: auto;
-        }
-
-        header {
-            text-align: center;
-            margin: 20px;
-        }
-
-        main,
-        footer {
-            text-align: center;
-            margin: 20px;
-        }
-
-        footer {
-            position: sticky;
-            top: 100vh;
-            top: 100dvh;
-            font-size: 12px;
-            font-family: var(--font-family);
-            color: var(--font-color);
-            text-align: center;
-        }
-
-        #summary {
-            font-size: 16px;
-            resize: none;
-            text-align: center;
-            padding: 5px;
-            border: none;
-            border-radius: 5px;
-            font-family: var(--font-family);
-            color: var(--font-color);
-        }
-
-        #addMemo {
-            margin-bottom: 20px 0;
-            font-size: 24px;
-            border: none;
-            background-color: transparent;
-            color: var(--primary-color);
-        }
-
-        .control-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin: 20px 0;
-        }
-
-        .control-buttons button {
-            border: 1px solid transparent;
-            border-radius: 5px;
-            background-color: transparent;
-            color: var(--primary-color);
-            padding: 0.5em;
-            cursor: pointer;
-            font-size: var(--font-size-base);
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .event-list {
-            position: relative;
-            margin-top: 10px;
-        }
-
-        .event {
-            margin-bottom: 0px;
-            position: relative;
-            padding-bottom: 10px;
-        }
-
-        .event-header {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            margin: 5px;
-            padding: 0px;
-        }
-
-        .event-icon {
-            color: #333;
-            font-size: 20px;
-            width: 24px;
-            margin-right: 5px;
-            transition: transform 0.3s ease;
-            text-align: center;
-        }
-
-        .event-icon.open {
-            transform: rotate(90deg);
-        }
-
-        .event-dot {
-            width: 10px;
-            height: 10px;
-            background-color: var(--primary-color);
-            border-radius: 50%;
-            margin-right: 5px;
-        }
-
-        .timeline-line {
-            position: absolute;
-            width: 4px;
-            background-color: var(--primary-color);
-            z-index: -1;
-            margin-left: 0px;
-        }
-
-        .memo-title {
-            font-family: 'Arial, Helvetica, sans-serif';
-            text-align: left;
-            padding: 5px;
-            font-size: 18px;
-            flex-grow: 1;
-            cursor: text;
-            border: none;
-            border-radius: 5px;
-        }
-
-        .event-content > * {
-            font-size: 16px;
-            margin: 5px 5px 0 0;
-            color: var(--font-color);
-        }
-
-        .event-content input[type="text"], 
-        .event-content textarea {
-            border: none;
-            border-radius: 5px;
-            background-color: var(--secondary-color);
-            color: var(--font-color);
-        }
-
-        .custom-quill-editor .ql-editor {
-            font-size: 12px;
-            background-color: var(--background-color);
-        }
-
-        .ql-tooltip {
-            z-index: 10000;
-        }
-
-        .ql-snow .ql-tooltip {
-            z-index: 10000;
-        }
-
-        .custom-quill-editor {
-            position: relative;
-        }
-
-        .event-content {
-            display: none;
-            margin-left: 10px;
-            padding-left: 10px;
-            overflow: visible;
-        }
-
-        .event-content.open {
-            display: block;
-            margin: 5px 10px 5px 55px;
-            padding: 10px;
-            border-radius: 5px;
-            background-color: var(--secondary-color);
-        }
-
-        .delete-icon {
-            width: 24px;
-            margin-left: auto;
-            cursor: pointer;
-        }
-
-        .center-delete-icon {
-            text-align: center;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .add-content-icon {
-            width: 24px;
-            cursor: pointer;
-            margin-left: 10px;
-        }
+      .circle-button {
+        position: absolute;
+        width: 50px;
+        height: 50px;
+      }
 
 
+      body {
+        font-family: 'Arial, Helvetica, sans-serif';
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        transition: background-color 0.3s, color 0.3s;
+        }
+      
+      /*全てのメモをまとめて保持する親コンテナ*/
+      #memo-container {
+        margin: 0 auto;
+        max-width: 800px;
+        padding: 10px;
+      }
+      
+      /*個々のメモのコンテナで、各メモの内容を保持する*/      
+      .memo-item {
+        padding: 10px;
+        margin: 37px 20px;
+        border-radius:10px;
+      }
+
+      .memo-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        margin-right: 5px;
+      }
+      
+      .textbox {
+        flex: 1;
+        border: none;
+        padding: 5px 15px;
+        margin-right: 10px;
+        text-align: left;
+        font-size: 16px;
+        background-color:  var(--bg-color);
+        color: var(--text-color);
+        transition: background-color 0.3s, color 0.3s;  
+      }
+      
+
+
+      .delete-btn {
+        width: 30px;
+        height: 30px;
+        color: var(--text-color);
+        background-color: var(--bg-color);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      
+      
+      /*Quill*/
+      .ql-editor {
+        min-height: 170px;
+      }
+      
+      .ql-editor ol,
+      .ql-editor ul {
+        padding-left: 0;
+        maring-left: 0;
+      }
+      
+      .ql-editor.ql-editor-1 {
+        padding-left: 0px;
+      }
+      
+      .ql-toolbar.ql-snow {
+        text-align: left;
+        margin-top: 10px;
+        border-radius: 10px;
+        width: 100%;
+        border: none;
+      }
+      
+      
+      #memo-container .memo-item .ql-container { /*特異性が足りずボーダーの上辺消えるため追記*/
+        margin: 5px 0;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        width: 100%;
+        background-color: var(--bg-color);
+        font-size: 16px;
+      }
+      
+      .sortable-ghost {
+        opacity: 0.4;
+      }
+      
     </style>
-</head>
+    <!--△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△-->
+  </head>
+  
+<!--▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼-->
 <body>
     <header>
-        <h1>Memo</h1>
+        <div class="assistive-touch" id="menuButton">
+          <div class="circle"></div>
+        </div>
+        <div class="menuContainer" id="menuContainer">
+          <button class="circle-button" id="add-memo-btn"><i class="fa-solid fa-folder-plus"></i></button>
+          <button class="circle-button" id="toggle-theme"><i class="fa fa-adjust"></i></button>
+          <button class="circle-button" id="save-button"><i class="fa fa-save"></i></button>
+          <button class="circle-button" id="share-button"><i class="fa fa-share-alt"></i></button>
+          <button class="circle-button" id="share-button"><i class="fa fa-share-alt"></i></button>
+          <button class="circle-button" id="outPut-button"><i class="fa-solid fa-arrow-up-from-bracket"></i></button>
+          <button class="circle-button" id="toggle-edit"><i class="fa fa-eye"></i></button>
+          <button class="circle-button" id="reset-button"><i class="fa fa-undo"></i></button>          
+        </div>
     </header>
+    
+  
+    <!--▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽-->
+    <main>    
+      
+        <!--add container-->
+        <div id="memo-container"></div>
 
-    <main>
-        <textarea id="summary" name="summary" rows="2" cols="30" maxlength="77" placeholder="Summary" class="auto-resize"></textarea>
-        <div class="input-group">
-            <button id="addMemo" onclick="generateMemo()"><i class="fa-solid fa-folder-plus"></i></button>
-        </div>
-
-        <div class="control-buttons">
-            <button id="toggle-all-events" onclick="toggleAllEvents()"><i class="fa fa-angle-double-down"></i></button>
-            <button id="save-button" onclick="saveMemo()"><i class="fa fa-save"></i></button>
-            <button id="share-button" onclick="shareEvents()"><i class="fa fa-share-alt"></i></button>
-            <button id="toggle-view" onclick="toggleEditMode()"><i class="fa fa-eye"></i></button>            
-            <button id="undo-button" onclick="undo()"><i class="fa fa-undo"></i></button>
-            <button id="toggle-theme" onclick="toggleTheme()"><i class="fa fa-adjust"></i></button>
-        </div>
-
-        <div class="event-list">
-            <div class="timeline-line"></div>
-        </div>
     </main>
-
+    <!--△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△△-->
+  
+  
     <footer>
-        <p>Copyright &copy; 2024 Memo Web Page. All right reserved.</p>
+        <!--blanck-->
     </footer>
-
-    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-    <script>
-        function autoResizeTextarea(textarea) {
-            textarea.style.height = 'auto'; 
-            textarea.style.height = textarea.scrollHeight + 'px';
-        }
-
-        const summaryTextarea = document.getElementById('summary');
-        summaryTextarea.addEventListener('input', function() {
-            autoResizeTextarea(this);
-        });
-
-        window.addEventListener('load', function() {
-            autoResizeTextarea(summaryTextarea);
-        });
-
-        let eventNumber = 1;
-
-        function generateMemo() {
-            const eventList = document.querySelector('.event-list');
-                
-            const eventDiv = document.createElement('div');
-            eventDiv.classList.add('event');
-                
-            const eventHeader = document.createElement('div');
-            eventHeader.classList.add('event-header');
-            eventHeader.setAttribute('onclick', `toggleEvent(${eventNumber})`);
-                
-            const eventIcon = document.createElement('span');
-            eventIcon.classList.add('event-icon', 'fa', 'fa-caret-right');
-            eventIcon.setAttribute('id', `icon-${eventNumber}`);
-                
-            const eventDot = document.createElement('span');
-            eventDot.classList.add('event-dot');
-                
-            const memoTitle = document.createElement('input');
-            memoTitle.classList.add('memo-title');
-            memoTitle.style.border = 'none';
-            memoTitle.placeholder = 'Enter title here'; // 初期状態でプレースホルダーを表示
-                
-            memoTitle.addEventListener('click', function(event) {
-                event.stopPropagation();
-            });
-        
-            const deleteIcon = document.createElement('span');
-            deleteIcon.classList.add('delete-icon');
-            deleteIcon.innerHTML = '<i class="fa-regular fa-trash-can"></i>';
-            deleteIcon.onclick = function(event) {
-                event.stopPropagation();
-                eventList.removeChild(eventDiv);
-                adjustTimelineLine(); // イベント削除後にタイムラインを調整
-            };
-        
-            eventHeader.appendChild(eventIcon);
-            eventHeader.appendChild(eventDot);
-            eventHeader.appendChild(memoTitle);
-            eventHeader.appendChild(deleteIcon);
-        
-            const eventContent = document.createElement('div');
-            eventContent.classList.add('event-content');
-            eventContent.setAttribute('id', `content-${eventNumber}`);
-        
-            const selectMenuContainer = document.createElement('div');
-            selectMenuContainer.style.display = 'flex';
-            selectMenuContainer.style.alignItems = 'center';
-            const selectMenu = document.createElement('select');
-            selectMenu.innerHTML = `
-                                <option value="" disabled selected>Select content type</option>
-                <option value="textbox">Textbox</option>
-                <option value="textarea">Textarea</option>
-                <option value="quill">Quill Editor</option>
-                <option value="map">Google Map</option>
-            `;
-        
-            const addContentIcon = document.createElement('span');
-            addContentIcon.classList.add('add-content-icon');
-            addContentIcon.innerHTML = '<i class="fa-solid fa-plus"></i>';
-            addContentIcon.onclick = function() {
-                const selectedValue = selectMenu.value;
-                if (selectedValue) {
-                    addContent(selectedValue, eventContent);
-                }
-            };
-        
-            selectMenuContainer.appendChild(selectMenu);
-            selectMenuContainer.appendChild(addContentIcon);
-            eventContent.appendChild(selectMenuContainer);
-        
-            eventDiv.appendChild(eventHeader);
-            eventDiv.appendChild(eventContent);
-            eventList.appendChild(eventDiv);
-        
-            eventNumber++;
-            adjustTimelineLine(); // 新しいイベント追加後にタイムラインを調整
-        }
-    
-        function addContent(type, container) {
-            const contentWrapper = document.createElement('div');
-            contentWrapper.style.display = 'block';
-            contentWrapper.style.alignItems = 'center';
-            contentWrapper.style.width = '100%';
-            contentWrapper.style.fontSize = '16px';
-                
-            const deleteIcon = document.createElement('span');
-            deleteIcon.classList.add('delete-icon');
-            deleteIcon.innerHTML = '<i class="fa-solid fa-minus"></i>';
-            deleteIcon.onclick = function() {
-                container.removeChild(contentWrapper);
-                adjustTimelineLine(); // 要素が削除されたときに呼び出し
-            };
-        
-            // 動的に追加される要素にhiddenクラスを適用
-            if (editModeActive) {
-                deleteIcon.classList.add('hidden');
-            }
-        
-            switch (type) {
-                case 'textbox':
-                    const textbox = document.createElement('input');
-                    textbox.type = 'text';
-                    textbox.placeholder = 'Enter text here';
-                    textbox.style.flex = '1';
-                    textbox.style.width = 'calc(100% - 24px)';
-                    textbox.style.fontSize = '16px';
-                    textbox.style.marginRight = '10px';
-                    textbox.style.padding = '5px';
-                    textbox.addEventListener('input', function() {
-                        adjustTimelineLine(); // テキストボックスの高さが変わったときに呼び出し
-                    });
-                    contentWrapper.appendChild(textbox);
-                    break;
-                case 'textarea':
-                    const textarea = document.createElement('textarea');
-                    textarea.placeholder = 'Enter detailed text here';
-                    textarea.style.flex = '1';
-                    textarea.style.width = 'calc(100% - 24px)';
-                    textarea.style.fontSize = '16px';                    
-                    textarea.style.marginRight = '10px';
-                    textarea.style.padding = '5px';
-                    textarea.style.resize = 'none';
-                    textarea.addEventListener('input', function() {
-                        this.style.height = 'auto'; // 一旦高さを自動にしてリセット
-                        this.style.height = this.scrollHeight + 'px'; // 内容の高さに基づいて高さを再設定
-                        adjustTimelineLine(); // テキストエリアの高さが変わったときに呼び出し
-                    });
-                    const resizeObserver = new ResizeObserver(() => {
-                        adjustTimelineLine(); // テキストエリアのリサイズを検知したときに呼び出し
-                    });
-                    resizeObserver.observe(textarea);
-                    contentWrapper.appendChild(textarea);
-                    break;
-                case 'quill':
-                    const quillContainer = document.createElement('div');
-                    quillContainer.style.width = '100%';
-                    quillContainer.style.overflow = 'visible'; // コンテナのオーバーフローを隠さない
-                    const quillEditor = document.createElement('div');
-                    quillEditor.classList.add('custom-quill-editor'); // カスタムクラスを追加
-                    quillEditor.style.height = 'auto';
-                    quillContainer.appendChild(quillEditor);
-                    contentWrapper.appendChild(quillContainer);
-                
-                    // カスタムツールバーオプションを設定
-                    const toolbarOptions = [
-                        ['bold', 'italic', 'underline', 'link'],
-                        [{'list': 'bullet'}, {'list': 'ordered'}],
-                        ['image']
-                    ];
-                
-                    const quill = new Quill(quillEditor, {
-                        theme: 'snow',
-                        modules: {
-                            toolbar: toolbarOptions
-                        }
-                    });
-                
-                    quill.on('text-change', function() {
-                        quillEditor.style.height = 'auto'; // 一旦高さを自動にしてリセット
-                        quillEditor.style.height = quillEditor.scrollHeight + 'px'; // 内容の高さに基づいて高さを再設定
-                        adjustTimelineLine(); // Quillエディタの内容が変更されたときに呼び出し
-                    });
-                    deleteIcon.classList.add('center-delete-icon'); // 中央揃えのクラスを追加
-                    contentWrapper.appendChild(deleteIcon); // 削除ボタンを下に配置
-                    break;
-                case 'map':
-                    const mapIframe = document.createElement('iframe');
-                    mapIframe.width = '100%';
-                    mapIframe.height = '450';
-                    mapIframe.style.border = '0';
-                    mapIframe.src = "https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=Tokyo,Japan";
-                    mapIframe.allowFullscreen = "";
-                    mapIframe.loading = "lazy";
-                    contentWrapper.appendChild(mapIframe);
-                    deleteIcon.classList.add('center-delete-icon'); // 中央揃えのクラスを追加
-                    contentWrapper.appendChild(deleteIcon); // 削除ボタンを下に配置
-                    break;
-                default:
-                    contentWrapper.innerHTML = '';
-            }
-        
-            contentWrapper.appendChild(deleteIcon);
-            container.appendChild(contentWrapper);
-        
-            // toggle-viewの状態を確認し、必要ならば非表示にする
-            if (editModeActive) {
-                deleteIcon.classList.add('hidden');
-            }
-        
-            adjustTimelineLine(); // 要素が追加されたときに呼び出し
-        }
-    
-        function toggleEvent(eventNumber) {
-            const content = document.getElementById(`content-${eventNumber}`);
-    
-            const icon = document.getElementById(`icon-${eventNumber}`);
-            const isOpen = content.classList.contains('open');
-            content.classList.toggle('open', !isOpen);
-            
-            if (isOpen) {
-                icon.classList.remove('fa-caret-down');
-                icon.classList.add('fa-caret-right');
-            } else {
-                icon.classList.remove('fa-caret-right');
-                icon.classList.add('fa-caret-down');
-            }
-            adjustTimelineLine();
-        }
-
-
-        // 前開閉
-        function toggleAllEvents() {
-            const eventContents = document.querySelectorAll('.event-content');
-            const eventIcons = document.querySelectorAll('.event-icon');
-            const toggleButtonIcon = document.getElementById('toggle-all-events').firstChild;
-            let allOpen = true;
-    
-            eventContents.forEach(content => {
-                if (!content.classList.contains('open')) {
-                    allOpen = false;
-                }
-            });
-    
-            eventContents.forEach((content, index) => {
-                const icon = eventIcons[index];
-                if (allOpen) {
-                    content.classList.remove('open');
-                    icon.classList.remove('fa-caret-down');
-                    icon.classList.add('fa-caret-right');
-                } else {
-                    content.classList.add('open');
-                    icon.classList.remove('fa-caret-right');
-                    icon.classList.add('fa-caret-down');
-                }
-            });
-    
-            if (allOpen) {
-                toggleButtonIcon.classList.remove('fa-angle-double-up');
-                toggleButtonIcon.classList.add('fa-angle-double-down');
-            } else {
-                toggleButtonIcon.classList.remove('fa-angle-double-down');
-                toggleButtonIcon.classList.add('fa-angle-double-up');
-            }
-    
-            adjustTimelineLine(); // Adjust the timeline line after toggling all events
-        }
-        
-
-        // ローカルストレージ保存・リロード
-        function saveMemo() {
-            const events = document.querySelectorAll('.event');
-            const memoData = [];
-
-            events.forEach(event => {
-                const title = event.querySelector('.memo-title').value;
-                const contentElements = event.querySelectorAll('.event-content > div');
-                const contents = [];
-            
-                contentElements.forEach(element => {
-                    if (element.querySelector('input[type="text"]')) {
-                        contents.push({ type: 'textbox', value: element.querySelector('input[type="text"]').value });
-                    } else if (element.querySelector('textarea')) {
-                        contents.push({ type: 'textarea', value: element.querySelector('textarea').value });
-                    } else if (element.querySelector('.custom-quill-editor')) {
-                        contents.push({ type: 'quill', value: element.querySelector('.ql-editor').innerHTML });
-                    } else if (element.querySelector('iframe')) {
-                        contents.push({ type: 'map', value: element.querySelector('iframe').src });
-                    }
-                });
-            
-                memoData.push({ title, contents });
-            });
-        
-            localStorage.setItem('memoData', JSON.stringify(memoData));
-            alert('Memo saved!');
-        }
-
-        window.addEventListener('load', function() {
-            autoResizeTextarea(summaryTextarea);
-            loadMemo(); // ロード時にメモデータを読み込み
-        });
-        
-        function loadMemo() {
-            const memoData = JSON.parse(localStorage.getItem('memoData'));
-            if (memoData) {
-                memoData.forEach((memo, index) => {
-                    generateMemo(); // メモイベントを生成
-                    const event = document.querySelectorAll('.event')[index];
-                    event.querySelector('.memo-title').value = memo.title;
-                
-                    const contentContainer = event.querySelector('.event-content');
-                    memo.contents.forEach(content => {
-                        addContent(content.type, contentContainer);
-                        const contentElements = contentContainer.querySelectorAll('div');
-                        const lastElement = contentElements[contentElements.length - 1];
-                        if (content.type === 'textbox') {
-                            lastElement.querySelector('input[type="text"]').value = content.value;
-                        } else if (content.type === 'textarea') {
-                            lastElement.querySelector('textarea').value = content.value;
-                        } else if (content.type === 'quill') {
-                            lastElement.querySelector('.ql-editor').innerHTML = content.value;
-                        } else if (content.type === 'map') {
-                            lastElement.querySelector('iframe').src = content.value;
-                        }
-                    });
-                });
-                adjustTimelineLine(); // タイムラインを調整
-            }
-        }
-
-
-        // ViewMode切り替え
-        let editModeActive = false;
-
-        function toggleEditMode() {
-            editModeActive = !editModeActive;
-
-            const addMemoButton = document.getElementById('addMemo');
-            const deleteIcons = document.querySelectorAll('.delete-icon');
-            const addContentIcons = document.querySelectorAll('.add-content-icon');
-            const selectMenus = document.querySelectorAll('select');
-
-            addMemoButton.classList.toggle('hidden', editModeActive);
-
-            deleteIcons.forEach(icon => {
-                icon.classList.toggle('hidden', editModeActive);
-            });
-        
-            addContentIcons.forEach(icon => {
-                icon.classList.toggle('hidden', editModeActive);
-            });
-        
-            selectMenus.forEach(menu => {
-                menu.classList.toggle('hidden', editModeActive);
-            });
-        
-            const eventContents = document.querySelectorAll('.event-content');
-            eventContents.forEach(content => {
-                const deleteIconsInContent = content.querySelectorAll('.delete-icon');
-                deleteIconsInContent.forEach(icon => {
-                    icon.classList.toggle('hidden', editModeActive);
-                });
-            });
-
-            adjustTimelineLine(); 
-        }
-
-
-        
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            const currentTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
-            localStorage.setItem('theme', currentTheme);
-        }
-    
-        // Load the saved theme from local storage
-        window.addEventListener('load', () => {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme && savedTheme === 'dark') {
-                document.body.classList.add('dark-mode');
-            }
-        });
-
-
-        // Dot and Line adjustment
-        function adjustTimelineLine() {
-            const eventList = document.querySelector('.event-list');
-            const events = document.querySelectorAll('.event');
-            const timelineLine = document.querySelector('.timeline-line');
-
-            if (events.length === 0) {
-                timelineLine.style.display = 'none';
-                return;
-            } else {
-                timelineLine.style.display = 'block';
-            }
-        
-            const firstEventDot = events[0].querySelector('.event-dot');
-            const lastEventDot = events[events.length - 1].querySelector('.event-dot');
-            const firstEventDotTop = firstEventDot.getBoundingClientRect().top;
-            const lastEventDotTop = lastEventDot.getBoundingClientRect().top;
-        
-            const eventListTop = eventList.getBoundingClientRect().top;
-            const lineTop = firstEventDotTop - eventListTop + (firstEventDot.offsetHeight / 2);
-            const lineHeight = lastEventDotTop - firstEventDotTop + (firstEventDot.offsetHeight / 2);
-        
-            timelineLine.style.top = `${lineTop}px`;
-            timelineLine.style.height = `${lineHeight}px`;
-            timelineLine.style.left = `${firstEventDot.offsetLeft + (firstEventDot.offsetWidth / 2) - (timelineLine.offsetWidth / 2)}px`;
-        }
-
-        window.addEventListener('load', adjustTimelineLine);
-        window.addEventListener('resize', adjustTimelineLine);
-    </script>
 </body>
+<!--▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲-->
+  
+  
+    <script src="scripts.js"></script> <!-- 外部JavaScriptファイルのリンク -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>  <!--for flatpickr-->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>  <!--for quilleditor-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script> <!--for sortable-->
+
+
+  
+    <script>
+    const menuButton = document.getElementById("menuButton");
+    const menuScreen = document.getElementById("menuContainer");
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    // 初期位置設定
+    function setInitialPosition() {
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
+      menuButton.style.left = screenWidth - menuButton.offsetWidth - "px";
+      menuButton.style.top = screenHeight - menuButton.offsetHeight - "px";
+    }
+
+    setInitialPosition();
+
+    // メニュースクリーンの中心をメニューボタンの中心に合わせる
+    menuButton.addEventListener("click", () => {
+      const buttonRect = menuButton.getBoundingClientRect();
+      const centerTop = buttonRect.top + buttonRect.height / 2;
+      menuScreen.style.top = `${centerTop}px`;
+      menuScreen.style.left = "50%";
+      menuScreen.style.display = menuScreen.style.display === "none" ? "flex" : "none";
+    });
+
+    // 画面リサイズ時の位置調整
+    window.addEventListener("resize", () => {
+      const rect = menuButton.getBoundingClientRect();
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
+
+      // ボタンが画面内に収まるように再配置
+      menuButton.style.left = Math.min(screenWidth - rect.width, parseFloat(menuButton.style.left)) + "px";
+      menuButton.style.top = Math.min(screenHeight - rect.height, parseFloat(menuButton.style.top)) + "px";
+    });
+
+    // PCのマウスイベント
+    menuButton.addEventListener("mousedown", (e) => {
+      startDrag(e.clientX, e.clientY);
+      document.addEventListener("mousemove", onDrag);
+    });
+
+    document.addEventListener("mouseup", endDrag);
+
+    // モバイルのタッチイベント
+    menuButton.addEventListener("touchstart", (e) => {
+      const touch = e.touches[0];
+      startDrag(touch.clientX, touch.clientY);
+      document.addEventListener("touchmove", onDrag);
+    });
+
+    document.addEventListener("touchend", endDrag);
+
+    function startDrag(clientX, clientY) {
+      isDragging = true;
+      offsetX = clientX - menuButton.getBoundingClientRect().left;
+      offsetY = clientY - menuButton.getBoundingClientRect().top;
+    }
+
+    function onDrag(e) {
+      if (isDragging) {
+        let clientX = e.clientX || e.touches[0].clientX;
+        let clientY = e.clientY || e.touches[0].clientY;
+
+        let x = clientX - offsetX;
+        let y = clientY - offsetY;
+        
+        // 画面内の範囲に制限
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        const buttonWidth = menuButton.offsetWidth;
+        const buttonHeight = menuButton.offsetHeight;
+
+        x = Math.max(0, Math.min(screenWidth - buttonWidth, x));
+        y = Math.max(0, Math.min(screenHeight - buttonHeight, y));
+
+        menuButton.style.left = x + "px";
+        menuButton.style.top = y + "px";
+        menuButton.style.position = "fixed";
+      }
+    }
+
+    function endDrag() {
+      if (isDragging) {
+        isDragging = false;
+        document.removeEventListener("mousemove", onDrag);
+        document.removeEventListener("touchmove", onDrag);
+        
+        // 画面の端に吸着させる
+        const rect = menuButton.getBoundingClientRect();
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+
+        const toLeft = rect.left;
+        const toRight = screenWidth - rect.right;
+        const toTop = rect.top;
+        const toBottom = screenHeight - rect.bottom;
+
+        const minDistance = Math.min(toLeft, toRight, toTop, toBottom);
+
+        if (minDistance === toLeft) {
+          menuButton.style.left = "0px";
+        } else if (minDistance === toRight) {
+          menuButton.style.left = screenWidth - rect.width + "px";
+        } else if (minDistance === toTop) {
+          menuButton.style.top = "0px";
+        } else if (minDistance === toBottom) {
+          menuButton.style.top = screenHeight - rect.height + "px";
+        }
+      }
+    }
+
+
+      // メニューボタンを円形に配置
+      document.addEventListener('DOMContentLoaded', () => {
+        const menuButton = document.getElementById("menuButton");
+        const container = document.getElementById('menuContainer');
+        const buttons = document.querySelectorAll('.circle-button');
+        const radius = 110;   // アイテムを配置する円の半径
+
+        buttons.forEach((button, index) => {
+          const angle = (2 * Math.PI * index) / buttons.length - Math.PI / 2; // 12時位置からスタート
+          const x = radius * Math.cos(angle);
+          const y = radius * Math.sin(angle);
+          button.style.left = `calc(50% + ${x}px - ${button.offsetWidth / 2}px)`;  // ボタンの中心調整
+          button.style.top = `calc(50% + ${y}px - ${button.offsetHeight / 2}px)`;  // ボタンの中心調整
+        });
+
+        // メニューボタンの中心位置にメニューコンテナを配置
+        const buttonRect = menuButton.getBoundingClientRect();
+        const containerSize = 0; // 初期サイズ
+        menuContainer.style.top = `${buttonRect.top + buttonRect.height / 2 - containerSize / 2}px`;
+        menuContainer.style.left = `${buttonRect.left + buttonRect.width / 2 - containerSize / 2}px`;
+
+        menuButton.addEventListener('click', () => {
+        menuContainer.classList.toggle('open');
+        });
+
+      });
+
+      // Dark mode
+      const button = document.getElementById('toggle-theme');
+      button.addEventListener('click', function() {
+          document.body.classList.toggle('dark-mode');
+      });
+    
+    
+      document.getElementById("add-memo-btn").addEventListener("click", function() {
+
+          // 新しいメモのコンテナを作成
+          const newMemo = document.createElement("div");
+          newMemo.classList.add("memo-item");
+          
+        
+        
+          // 上部コンテナ (テキストボックスと削除ボタン)
+          const memoHeader = document.createElement("div");
+          memoHeader.classList.add("memo-header");            
+
+          // テキストボックスを追加
+          const inputElement = document.createElement("input");
+          inputElement.type = "text";
+          inputElement.placeholder = "タイトルを入力してください";
+          inputElement.classList.add("textbox");
+          memoHeader.appendChild(inputElement);
+        
+          // 削除ボタンを追加
+          const deleteButton = document.createElement("button");
+          deleteButton.classList.add("delete-button");
+          deleteButton.innerHTML = '<i class="fa-solid fa-circle-minus"></i>';
+          deleteButton.addEventListener("click", function() {
+              newMemo.remove();
+          });
+          memoHeader.appendChild(deleteButton);
+
+        
+        
+          // メモコンテナにヘッダーを追加
+          newMemo.appendChild(memoHeader);
+        
+          // Quill エディターをメモに追加
+          const editorContainer = document.createElement("div");
+          editorContainer.classList.add("quill-editor");
+          newMemo.appendChild(editorContainer);
+
+          // コンテナに新しいメモを追加
+          document.getElementById("memo-container").appendChild(newMemo);
+
+          // Quill エディターを初期化
+          const quill = new Quill(editorContainer, {
+              theme: 'snow',
+              bounds: '#editor',
+              modules: {
+                toolbar: [
+                  ['bold', 'italic'],      // Text styling
+                  [{ 'list': 'ordered'}, { 'list': 'bullet' }],   // Lists
+                  [{ 'indent': '-1' }, { 'indent': '+1' }],       // outdent/indent                  
+                  ['link', 'image', 'video']   
+                ]
+              }
+          });
+      });
+
+      // SortableJSを利用してメモの順番を入れ替える
+      new Sortable(document.getElementById("memo-container"), {
+          swapThreshold: 0.4,
+          animation: 150,
+          ghostClass: 'sortable-ghost'
+      });
+    </script>
+
 </html>
