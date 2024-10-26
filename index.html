@@ -91,6 +91,7 @@
 
       body {
         font-family: 'Arial, Helvetica, sans-serif';
+        height: 100vh;
         background-color: var(--bg-color);
         color: var(--text-color);
         transition: background-color 0.3s, color 0.3s;
@@ -291,7 +292,7 @@
     function onDrag(e) {
       if (isDragging) {
         e.preventDefault();
-        
+
         let clientX = e.clientX || e.touches[0].clientX;
         let clientY = e.clientY || e.touches[0].clientY;
 
