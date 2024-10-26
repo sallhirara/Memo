@@ -283,7 +283,21 @@
         const touch = e.touches[0];
         startDrag(touch.clientX, touch.clientY);
         document.addEventListener("touchmove", onDrag);
+
+      // スクロールを無効化
+      document.addEventListener("touchmove", preventScroll, { passive: false });
       });
+
+      document.addEventListener("touchend", (e) => {
+        endDrag();
+        // スクロール無効化の解除
+        document.removeEventListener("touchmove", preventScroll);
+      });
+
+      // preventScroll関数の定義
+      function preventScroll(e) {
+        e.preventDefault();
+      }
 
       document.addEventListener("touchend", endDrag);
 
@@ -295,7 +309,7 @@
 
       function onDrag(e) {
         if (isDragging) {
-          e.preventDefault();
+          e.preventDefault(); // スクロールを防ぐ
 
           let clientX = e.clientX || e.touches[0].clientX;
           let clientY = e.clientY || e.touches[0].clientY;
