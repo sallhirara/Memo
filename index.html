@@ -457,6 +457,97 @@
         document.body.classList.toggle('dark-mode');
       });
 
+      // ローカルストレージにメモを保存する関数
+      //ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー      
+      function saveMemos() {
+          const memos = [];
+          document.querySelectorAll('.memo-item').forEach(memo => {
+              const title = memo.querySelector('.textbox').value;
+              const content = memo.querySelector('.ql-editor').innerHTML;
+              memos.push({ title, content });
+          });
+          localStorage.setItem('memos', JSON.stringify(memos));
+          
+      }
+
+      // 保存ボタンのクリックイベント
+      document.getElementById('save-button').addEventListener('click', saveMemos);
+
+      // ページロード時にローカルストレージからメモをロードする関数
+      function loadMemos() {
+          const savedMemos = JSON.parse(localStorage.getItem('memos')) || [];
+          savedMemos.forEach(({ title, content }) => {
+              addMemo(title, content);
+          });
+      }
+
+      // メモを追加する関数（新規作成もロード時も同じ処理を使う）
+      function addMemo(title = '', content = '') {
+          const newMemo = document.createElement("div");
+          newMemo.classList.add("memo-item");
+
+          const memoHeader = document.createElement("div");
+          memoHeader.classList.add("memo-header");
+
+          const inputElement = document.createElement("input");
+          inputElement.type = "text";
+          inputElement.placeholder = "Memo Title";
+          inputElement.classList.add("textbox");
+          inputElement.value = title;
+          memoHeader.appendChild(inputElement);
+
+          const deleteButton = document.createElement("button");
+          deleteButton.classList.add("delete-button");
+          deleteButton.innerHTML = '<i class="fa-solid fa-circle-minus"></i>';
+          deleteButton.addEventListener("click", function() {
+              newMemo.remove();
+              saveMemos();  // 削除後に保存
+          });
+          memoHeader.appendChild(deleteButton);
+
+          const sortButton = document.createElement("button");
+          sortButton.classList.add("sort-button");
+          sortButton.innerHTML = '<i class="fa-solid fa-grip"></i>';
+          memoHeader.appendChild(sortButton);
+
+          newMemo.appendChild(memoHeader);
+
+          const editorContainer = document.createElement("div");
+          editorContainer.classList.add("quill-editor");
+          newMemo.appendChild(editorContainer);
+
+          document.getElementById("memo-container").appendChild(newMemo);
+
+          const quill = new Quill(editorContainer, {
+              theme: 'snow',
+              modules: {
+                  toolbar: [
+                      ['bold', 'italic'],
+                      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                      [{ 'indent': '-1' }, { 'indent': '+1' }],
+                      ['link', 'image', 'video']
+                  ]
+              }
+          });
+          quill.root.innerHTML = content;
+          quill.on('text-change', saveMemos);  // テキスト変更時に保存
+      }
+
+      // ページロード時にメモをロード
+      document.addEventListener('DOMContentLoaded', () => {
+          loadMemos();
+          
+          // SortableJSの再初期化
+          new Sortable(document.getElementById("memo-container"), {
+              swapThreshold: 0.4,
+              animation: 150,
+              ghostClass: 'sortable-ghost',
+              handle: ".sort-button"
+          });
+      });
+      //ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
+      
+      
       //　Reset All
       document.getElementById("reset-button").addEventListener("click", function() {
         const memoContainer = document.getElementById("memo-container");
