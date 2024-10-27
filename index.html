@@ -90,6 +90,9 @@
         text-align: center;
       }
 
+      .hidden {
+        display: none !important;
+      }
       
 
       .menuContainer {
@@ -234,7 +237,7 @@
           </button>
           
           <button class="circle-button" id="toggle-edit">
-            <i class="fa fa-eye"></i>
+            <i class="fa fa-pen-to-square"></i>
             <span class="icon-label">Edit</span>
           </button>
           
@@ -250,8 +253,8 @@
 
           <button class="circle-button" id="reset-button">
             <i class="fa fa-undo"></i>
-            <span class="icon-label">Add Memo</span>
-          </i></button>          
+            <span class="icon-label">Reset Memos</span>
+          </button>          
 
           <button class="circle-button" id="save-button">
             <i class="fa fa-save"></i>
@@ -296,7 +299,7 @@
       let isDragging = false;
       let offsetX, offsetY;
 
-      // 初期位置設定
+      // menuButton の初期位置設定
       function setInitialPosition() {
         const margin = 10;
         const screenWidth = window.innerWidth;
@@ -446,70 +449,103 @@
         }
       });
 
+
+      // メニュー機能
       // Dark mode
       const button = document.getElementById('toggle-theme');
       button.addEventListener('click', function() {
-          document.body.classList.toggle('dark-mode');
+        document.body.classList.toggle('dark-mode');
       });
-    
-    
+
+      //　Reset All
+      document.getElementById("reset-button").addEventListener("click", function() {
+        const memoContainer = document.getElementById("memo-container");
+        
+        while (memoContainer.firstChild) {
+          memoContainer.removeChild(memoContainer.firstChild);
+        }
+      });
+        
+      // Toggle edit mode for delete and sort buttons
+      const toggleEditButton = document.getElementById('toggle-edit');
+      let isEditMode = true;
+      toggleEditButton.querySelector('i').className = 'fa fa-pen-to-square';
+
+      toggleEditButton.addEventListener('click', () => {
+        isEditMode = !isEditMode;
+
+        // Toggle icons for edit mode
+        toggleEditButton.querySelector('i').className = isEditMode ? 'fa fa-pen-to-square' : 'fa fa-eye';
+
+        // Get all delete and sort buttons within memo items
+        const deleteButtons = document.querySelectorAll('.memo-item .delete-button');
+        const sortButtons = document.querySelectorAll('.memo-item .sort-button');
+
+        // Toggle visibility for delete and sort buttons
+        deleteButtons.forEach(button => button.classList.toggle('hidden', !isEditMode));
+        sortButtons.forEach(button => button.classList.toggle('hidden', !isEditMode));
+      });   
+
+
+
+      // Memo Container
       document.getElementById("add-memo-btn").addEventListener("click", function() {
 
-          // 新しいメモのコンテナを作成
-          const newMemo = document.createElement("div");
-          newMemo.classList.add("memo-item");
-          
+        // 新しいメモのコンテナを作成
+        const newMemo = document.createElement("div");
+        newMemo.classList.add("memo-item");
         
-          // 上部コンテナ (テキストボックスと削除ボタン　　+　ソートボタン)
-          const memoHeader = document.createElement("div");
-          memoHeader.classList.add("memo-header");            
+      
+        // 上部コンテナ (テキストボックスと削除ボタン　　+　ソートボタン)
+        const memoHeader = document.createElement("div");
+        memoHeader.classList.add("memo-header");            
 
-          // テキストボックスを追加
-          const inputElement = document.createElement("input");
-          inputElement.type = "text";
-          inputElement.placeholder = "Memo Title";
-          inputElement.classList.add("textbox");
-          memoHeader.appendChild(inputElement);
-        
-          // 削除ボタンを追加
-          const deleteButton = document.createElement("button");
-          deleteButton.classList.add("delete-button");
-          deleteButton.innerHTML = '<i class="fa-solid fa-circle-minus"></i>';
-          deleteButton.addEventListener("click", function() {
-              newMemo.remove();
-          });
-          memoHeader.appendChild(deleteButton);
+        // テキストボックスを追加
+        const inputElement = document.createElement("input");
+        inputElement.type = "text";
+        inputElement.placeholder = "Memo Title";
+        inputElement.classList.add("textbox");
+        memoHeader.appendChild(inputElement);
+      
+        // 削除ボタンを追加
+        const deleteButton = document.createElement("button");
+        deleteButton.classList.add("delete-button");
+        deleteButton.innerHTML = '<i class="fa-solid fa-circle-minus"></i>';
+        deleteButton.addEventListener("click", function() {
+            newMemo.remove();
+        });
+        memoHeader.appendChild(deleteButton);
 
-          // ソートボタンを追加
-          const sortButton = document.createElement("button");
-          sortButton.classList.add("sort-button");
-          sortButton.innerHTML = '<i class="fa-solid fa-grip"></i>'; // ソートアイコン
-          memoHeader.appendChild(sortButton);
-        
-          // メモコンテナにヘッダーを追加
-          newMemo.appendChild(memoHeader);
-        
-          // Quill エディターをメモに追加
-          const editorContainer = document.createElement("div");
-          editorContainer.classList.add("quill-editor");
-          newMemo.appendChild(editorContainer);
+        // ソートボタンを追加
+        const sortButton = document.createElement("button");
+        sortButton.classList.add("sort-button");
+        sortButton.innerHTML = '<i class="fa-solid fa-grip"></i>'; // ソートアイコン
+        memoHeader.appendChild(sortButton);
+      
+        // メモコンテナにヘッダーを追加
+        newMemo.appendChild(memoHeader);
+      
+        // Quill エディターをメモに追加
+        const editorContainer = document.createElement("div");
+        editorContainer.classList.add("quill-editor");
+        newMemo.appendChild(editorContainer);
 
-          // コンテナに新しいメモを追加
-          document.getElementById("memo-container").appendChild(newMemo);
+        // コンテナに新しいメモを追加
+        document.getElementById("memo-container").appendChild(newMemo);
 
-          // Quill エディターを初期化
-          const quill = new Quill(editorContainer, {
-              theme: 'snow',
-              bounds: '#editor',
-              modules: {
-                toolbar: [
-                  ['bold', 'italic'],      // Text styling
-                  [{ 'list': 'ordered'}, { 'list': 'bullet' }],   // Lists
-                  [{ 'indent': '-1' }, { 'indent': '+1' }],       // outdent/indent                  
-                  ['link', 'image', 'video']   
-                ]
-              }
-          });
+        // Quill エディターを初期化
+        const quill = new Quill(editorContainer, {
+            theme: 'snow',
+            bounds: '#editor',
+            modules: {
+              toolbar: [
+                ['bold', 'italic'],      // Text styling
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],   // Lists
+                [{ 'indent': '-1' }, { 'indent': '+1' }],       // outdent/indent                  
+                ['link', 'image', 'video']   
+              ]
+            }
+        });
       });
 
       // SortableJSを利用してメモの順番を入れ替える
