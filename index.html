@@ -515,7 +515,15 @@
       
       //　Reset All
       //ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
-
+      document.addEventListener("DOMContentLoaded", function() {
+    const resetButton = document.getElementById("reset-button");
+    resetButton.addEventListener("click", function() {
+        if (confirm("Are you sure you want to delete all memos?")) {
+            const memoContainer = document.getElementById("memo-container");
+            memoContainer.innerHTML = ""; // Removes all memo-item elements within the container
+        }
+    });
+});
       //ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
 
         
