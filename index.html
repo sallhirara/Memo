@@ -79,7 +79,7 @@
 
       .circle-button i {
         font-size: 25px;
-        padding-top:
+        padding-top:0;
       }
 
       .icon-label {
@@ -210,14 +210,28 @@
       .ql-editor ol,
       .ql-editor ul {
         padding-left: 0;
-        maring-left: 0;
+        margin-left: 0;
       }
       
       .ql-editor.ql-editor-1 {
         padding-left: 0px;
       }
       
+      /*　ツールバー表示のアニメーション　*/
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
       .ql-toolbar.ql-snow {
+        display: none;
+        animation: slideDown 1s ease forwards;
         text-align: left;
         border-radius: 10px;
         width: 100%;
@@ -630,6 +644,44 @@
                 ]
             }
         });
+
+
+
+        // ツールバーを隠すコード　▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
+
+        // ツールバーをデフォルトで非表示に設定
+        const toolbar = editorContainer.previousElementSibling;
+        toolbar.style.display = "none";
+
+        // ツールバーとエディターのフォーカス制御
+        function showToolbar() {
+            toolbar.style.display = "block";  // フォーカス時にツールバーを表示
+        }
+
+        function hideToolbar() {
+            toolbar.style.display = "none";   // フォーカスが外れたらツールバーを非表示
+        }
+
+        // エディターとツールバーの両方でフォーカスイベントを設定
+        editorContainer.addEventListener("focusin", showToolbar);
+        toolbar.addEventListener("focusin", showToolbar);
+
+        // エディターとツールバーの両方でフォーカスが外れたときにツールバーを非表示
+        editorContainer.addEventListener("focusout", (e) => {
+            if (!editorContainer.contains(e.relatedTarget) && !toolbar.contains(e.relatedTarget)) {
+                hideToolbar();
+            }
+        });
+
+        toolbar.addEventListener("focusout", (e) => {
+            if (!editorContainer.contains(e.relatedTarget) && !toolbar.contains(e.relatedTarget)) {
+                hideToolbar();
+            }
+        });
+        
+        //　ここまでツールバーを隠すコード　▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
+
 
         // "toggle-icon" のクリックmemo-item 開閉できるように
         toggleIcon.addEventListener("click", function() {
