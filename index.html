@@ -653,7 +653,7 @@
         const toolbar = editorContainer.previousElementSibling;
         toolbar.style.display = "none";
 
-        // ツールバーとエディターのフォーカス制御
+        // ツールバーとエディターのフォーカス制御 (PCおよび携帯)
         function showToolbar() {
             toolbar.style.display = "block";  // フォーカス時にツールバーを表示
         }
@@ -662,11 +662,15 @@
             toolbar.style.display = "none";   // フォーカスが外れたらツールバーを非表示
         }
 
-        // エディターとツールバーの両方でフォーカスイベントを設定
+        // エディターとツールバーの両方でフォーカス/タッチイベントを設定 (PC対応)
         editorContainer.addEventListener("focusin", showToolbar);
         toolbar.addEventListener("focusin", showToolbar);
 
-        // エディターとツールバーの両方でフォーカスが外れたときにツールバーを非表示
+        // 携帯用にタッチイベントを追加
+        editorContainer.addEventListener("touchstart", showToolbar);
+        toolbar.addEventListener("touchstart", showToolbar);
+
+        // エディターとツールバーの両方でフォーカスが外れたときにツールバーを非表示 (PC)
         editorContainer.addEventListener("focusout", (e) => {
             if (!editorContainer.contains(e.relatedTarget) && !toolbar.contains(e.relatedTarget)) {
                 hideToolbar();
@@ -675,6 +679,13 @@
 
         toolbar.addEventListener("focusout", (e) => {
             if (!editorContainer.contains(e.relatedTarget) && !toolbar.contains(e.relatedTarget)) {
+                hideToolbar();
+            }
+        });
+
+        // タッチ終了時にフォーカスが外れたか確認しツールバーを非表示 (携帯)
+        document.addEventListener("touchend", (e) => {
+            if (!editorContainer.contains(e.target) && !toolbar.contains(e.target)) {
                 hideToolbar();
             }
         });
