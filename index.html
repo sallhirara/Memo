@@ -459,6 +459,7 @@
 
       // ローカルストレージにメモを保存する関数
       //ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
+      // Saveボタンのクリックでローカルストレージに全ての内容を保存する処理
       document.getElementById("save-button").addEventListener("click", function() {
         // 保存するデータの準備
         const memos = [];
@@ -469,18 +470,19 @@
         });
 
         const isDarkMode = document.body.classList.contains('dark-mode');
-        const isEditMode = isEditMode; // 編集モードの状態
+        const isEditModeState = isEditMode; // 編集モードの状態
 
         // ローカルストレージに保存
         localStorage.setItem("memos", JSON.stringify(memos));
         localStorage.setItem("isDarkMode", JSON.stringify(isDarkMode));
-        localStorage.setItem("isEditMode", JSON.stringify(isEditMode));
+        localStorage.setItem("isEditMode", JSON.stringify(isEditModeState));
       });
 
       //ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
       
       // ローカルストレージからメモを読み込む関数
       //ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
+      // ページ読み込み時に自動でデータをロードする処理
       document.addEventListener("DOMContentLoaded", function() {
         // メモの復元
         const savedMemos = JSON.parse(localStorage.getItem("memos"));
@@ -512,7 +514,7 @@
             // ソートボタン
             const sortButton = document.createElement("button");
             sortButton.classList.add("sort-button");
-            sortButton.innerHTML = '<i class="fa-solid fa-grip"></i>';
+            sortButton.innerHTML = '<i class="fa-solid fa-grip"></i>'; // ソートアイコン
             memoHeader.appendChild(sortButton);
 
             newMemo.appendChild(memoHeader);
@@ -524,6 +526,7 @@
 
             document.getElementById("memo-container").appendChild(newMemo);
 
+            // Quill エディターを初期化して、内容を復元
             const quill = new Quill(editorContainer, {
               theme: 'snow',
               bounds: '#editor',
@@ -551,6 +554,7 @@
         const isEditModeSaved = JSON.parse(localStorage.getItem("isEditMode"));
         if (isEditModeSaved !== null) {
           isEditMode = isEditModeSaved;
+          const toggleEditButton = document.getElementById('toggle-edit');
           toggleEditButton.querySelector('i').className = isEditMode ? 'fa fa-pen-to-square' : 'fa fa-eye';
 
           const deleteButtons = document.querySelectorAll('.memo-item .delete-button');
