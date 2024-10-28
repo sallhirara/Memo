@@ -283,9 +283,9 @@
             <span class="icon-label">Add Memo</span>
           </button>
 
-          <button class="circle-button" id="reset-button">
+          <button class="circle-button" id="undo-button">
             <i class="fa fa-undo"></i>
-            <span class="icon-label">Reset Memos</span>
+            <span class="icon-label">Undo</span>
           </button>          
 
           <button class="circle-button" id="save-button">
@@ -499,14 +499,10 @@
       
       
       
-      //　Reset All
-      document.getElementById("reset-button").addEventListener("click", function() {
-        const memoContainer = document.getElementById("memo-container");
-        
-        while (memoContainer.firstChild) {
-          memoContainer.removeChild(memoContainer.firstChild);
-        }
-      });
+      //　Undo 機能の関数
+      
+      
+
         
       // Toggle edit mode for delete and sort buttons
       const toggleEditButton = document.getElementById('toggle-edit');
@@ -527,9 +523,46 @@
         deleteButtons.forEach(button => button.classList.toggle('hidden', !isEditMode));
         sortButtons.forEach(button => button.classList.toggle('hidden', !isEditMode));
       });   
+      
+        // 全開閉トグル
+        // tab-toggle ボタンをクリックして全てのメモを開閉する機能
+        const tabToggleButton = document.getElementById('tab-toggle');
+
+        tabToggleButton.addEventListener('click', () => {
+          // すべてのメモアイテムを取得
+          const memoItems = document.querySelectorAll('.memo-item');
+          let isAllOpen = Array.from(memoItems).every(memoItem => {
+            return !memoItem.querySelector('.editor-wrapper').classList.contains('hidden');
+          });
+
+          // すべてのメモを開閉する
+          memoItems.forEach(memoItem => {
+            const editorWrapper = memoItem.querySelector('.editor-wrapper');
+            const toggleIcon = memoItem.querySelector('.toggle-icon');
+
+            if (isAllOpen) {
+              // すべて閉じる
+              editorWrapper.classList.add('hidden');
+              toggleIcon.classList.add('fa-caret-right');
+              toggleIcon.classList.remove('fa-caret-down');
+            } else {
+              // すべて開く
+              editorWrapper.classList.remove('hidden');
+              toggleIcon.classList.remove('fa-caret-right');
+              toggleIcon.classList.add('fa-caret-down');
+            }
+          });
+
+          // tab-toggleボタンのアイコンを変更
+          if (isAllOpen) {
+            tabToggleButton.querySelector('i').className = 'fa-solid fa-angles-down';
+          } else {
+            tabToggleButton.querySelector('i').className = 'fa-solid fa-angles-up';
+          }
+        });
 
 
-
+      // ▼▼▼▼▼▼▼▼▼▼▼　ここからメモコンテナを追加していくパート　▼▼▼▼▼▼▼▼▼▼
       // Memo Container
       document.getElementById("add-memo-btn").addEventListener("click", function() {
 
@@ -609,7 +642,10 @@
         });
     });
       
-
+      // ▲▲▲▲▲▲▲▲▲▲　ここまでメモコンテナを追加していくパート　▲▲▲▲▲▲▲▲▲▲
+      
+      
+      
       // SortableJSを利用してメモの順番を入れ替える
       new Sortable(document.getElementById("memo-container"), {
           swapThreshold: 0.4,
