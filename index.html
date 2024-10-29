@@ -208,6 +208,8 @@
         user-select: text;
         -webkit-user-select: text; /* Safari用の設定 */
         transition: min-height 1s ease;
+        position: relative;
+        z-index: 1;
       }
       
       .ql-editor ol,
@@ -240,13 +242,25 @@
         border-radius: 10px;
         width: 100%;
         border: none;
+        position: relative;
+        z-index: 10;
       }
-      
+    
       .ql-toolbar.ql-snow.visible {
         opacity: 1;
         visibility: visible;
+      } 
+      
+      .ql-color-picker {
+        position: absolute;
+        z-index: 100;
       }
-     
+      
+      .ql-link {
+        position: relative;
+        z-index: 100;
+      }
+      
       
       #memo-container .memo-item .ql-container { /*特異性が足りずボーダーの上辺消えるため追記*/
         border: none;
@@ -710,6 +724,18 @@
             const value = prompt('Enter the link URL');
             if (value) {
                 quill.format('link', value);  // リンクを挿入
+            }
+        });
+        
+        //Position of Popup
+        quill.on('selection-change', (range) => {
+            if (range) {
+                const bounds = quill.getBounds(range);
+                popup.style.top = `${bounds.top - 30}px`; // テキストの上に配置
+                popup.style.left = `50%`; // 中央に配置
+                popup.style.display = 'block'; // ポップアップを表示
+            } else {
+                popup.style.display = 'none'; // 選択が解除されたら非表示
             }
         });
 
