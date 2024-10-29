@@ -248,6 +248,14 @@
         font-family: 'Arial, Helvetica, sans-serif';
       }
       
+      @media (min-width: 768px) { 
+        /* 768px以上の画面幅（一般的にタブレットやPC）に対して適用 */
+        #memo-container .memo-item .ql-container {
+          font-size: 12px; /* PCではフォントサイズを50pxに変更 */
+        }
+      }
+
+      
       .sortable-ghost {
         opacity: 0.4;
       }
