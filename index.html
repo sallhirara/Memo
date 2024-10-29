@@ -205,6 +205,8 @@
       /*Quill*/  
       .ql-editor {
         min-height: 170px;
+        user-select: text;
+        -webkit-user-select: text; /* Safari用の設定 */
         transition: min-height 1s ease;
       }
       
@@ -232,11 +234,17 @@
 
       .ql-toolbar.ql-snow {
         display: none;
+        justify-content: center; /*toolbar のアイテム中央に*/
         animation: slideDown 0.5s ease forwards;
         text-align: left;
         border-radius: 10px;
         width: 100%;
         border: none;
+      }
+      
+      .ql-toolbar.ql-snow.visible {
+        opacity: 1;
+        visibility: visible;
       }
      
       
@@ -679,44 +687,29 @@
 
         // ツールバーを隠すコード　▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
 
-        // ツールバーをデフォルトで非表示に設定
-        const toolbar = editorContainer.previousElementSibling;
-        toolbar.style.display = "none";
-
-        // ツールバーとエディターのフォーカス制御 (PCおよび携帯)
-        function showToolbar() {
-            toolbar.style.display = "block";  // フォーカス時にツールバーを表示
-        }
-
-        function hideToolbar() {
-            toolbar.style.display = "none";   // フォーカスが外れたらツールバーを非表示
-        }
-
-        // エディターとツールバーの両方でフォーカス/タッチイベントを設定 (PC対応)
-        editorContainer.addEventListener("focusin", showToolbar);
-        toolbar.addEventListener("focusin", showToolbar);
-
-        // 携帯用にタッチイベントを追加
-        editorContainer.addEventListener("touchstart", showToolbar);
-        toolbar.addEventListener("touchstart", showToolbar);
-
-        // エディターとツールバーの両方でフォーカスが外れたときにツールバーを非表示 (PC)
-        editorContainer.addEventListener("focusout", (e) => {
-            if (!editorContainer.contains(e.relatedTarget) && !toolbar.contains(e.relatedTarget)) {
-                hideToolbar();
-            }
+        // エディターがフォーカスされたとき
+        quill.root.addEventListener('focus', function() {
+        document.querySelector('.ql-toolbar').style.display = 'flex';
+        document.querySelector('.ql-toolbar').style.justifycontent = 'center';
         });
 
-        toolbar.addEventListener("focusout", (e) => {
-            if (!editorContainer.contains(e.relatedTarget) && !toolbar.contains(e.relatedTarget)) {
-                hideToolbar();
-            }
-        });
+        // クリックした場所がツールバーやエディタ内でなければツールバーを非表示にする
+        document.addEventListener('click', function(event) {
+          const toolbar = document.querySelector('.ql-toolbar');
+          const editor = document.querySelector('.ql-editor');
 
-        // タッチ終了時にフォーカスが外れたか確認しツールバーを非表示 (携帯)
-        document.addEventListener("touchend", (e) => {
-            if (!editorContainer.contains(e.target) && !toolbar.contains(e.target)) {
-                hideToolbar();
+          // クリックした場所がツールバーやエディタ内でない場合、ツールバーを非表示にする
+          if (!toolbar.contains(event.target) && !editor.contains(event.target)) {
+            toolbar.style.display = 'none';
+          } else {
+            toolbar.style.display = 'flex';
+          }
+        });
+      
+        quill.getModule('toolbar').addHandler('link', function() {
+            const value = prompt('Enter the link URL');
+            if (value) {
+                quill.format('link', value);  // リンクを挿入
             }
         });
 
