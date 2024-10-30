@@ -372,9 +372,6 @@
     <script src="scripts.js"></script> <!-- 外部JavaScriptファイルのリンク -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>  <!--for flatpickr-->
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>  <!--for quilleditor-->
-    <script src="https://cdn.jsdelivr.net/npm/quilljs-markdown@latest/dist/quilljs-markdown.min.js"></script>
-<!--for quilleditor Markdown plagin-->
-
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script> <!--for sortable-->
 
 
@@ -383,8 +380,6 @@
 
       // ページロード時にダークモードを適用
       document.body.classList.add('dark-mode');
-      
-      
       
       // メニューボタンドラッグのためのコード
       const menuButton = document.getElementById("menuButton");
@@ -585,6 +580,7 @@
       button.addEventListener('click', function() {
         document.body.classList.toggle('dark-mode');
       });
+      
 
       // ローカルストレージにメモを保存する関数
       //ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
@@ -602,7 +598,7 @@
         alert('StickyMemo has been saved.');
       });
 
-      // ここから　　ページロード時にローカルストレージからメモを読み込む
+      // ページロード時にローカルストレージからメモを読み込む
       document.addEventListener('DOMContentLoaded', function() {
         const savedMemos = JSON.parse(localStorage.getItem('StickyMemo'));
         if (savedMemos) {
@@ -670,20 +666,9 @@
                   [{ 'list': 'ordered' }, { 'list': 'bullet' }],   // Lists
                   [{ 'indent': '-1' }, { 'indent': '+1' }],       // outdent/indent
                   ['link', 'image']
-                ],
-                markdownShortcuts: {}  // Markdownショートカットを追加
+                ]
               }
             });
-            
-            // Markdownプラグインを適用
-            new QuillMarkdown(quill, {
-                // 必要に応じてオプションを追加
-            });
-              
-            // Markdownプラグインを適用
-            const markdownOptions = {}; // 必要に応じて設定を追加
-            new QuillMarkdown(quill, markdownOptions);
-            
 
             // 保存された内容をエディターに設定
             quill.root.innerHTML = memoData.content;
@@ -697,28 +682,7 @@
             });
           });
         }
-      });      
-
-      // Editmodeをオフに設定ーーーーーーーーーーーーーーーーーーーー
-      document.addEventListener('DOMContentLoaded', function() {
-        // リロード後、Editmodeを必ずオフに設定
-        let isEditMode = false;
-
-        // Editモードボタンのアイコンを「目のアイコン」に更新
-        const toggleEditButton = document.getElementById('toggle-edit');
-        if (toggleEditButton) {
-          toggleEditButton.querySelector('i').className = 'fa fa-eye'; // アイコンを更新してEditmodeオフを示す
-        }
-
-        // 削除ボタンとソートボタンを非表示にする
-        const deleteButtons = document.querySelectorAll('.memo-item .delete-button');
-        const sortButtons = document.querySelectorAll('.memo-item .sort-button');
-        deleteButtons.forEach(button => button.classList.add('hidden')); // 削除ボタンを非表示
-        sortButtons.forEach(button => button.classList.add('hidden'));  // ソートボタンを非表示
       });
-      // Editmodeをオフに設定ーーーーーーーーーーーーーーーーーーーー
-
-      // ここまで　　ページロード時にローカルストレージからメモを読み込む
 
 
 
@@ -738,30 +702,40 @@
               location.reload();
           }
       });
-
-
       //ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
 
         
-      // エディットモード　Toggle edit mode for delete and sort buttons
+      // 編集モードのトグルボタンの参照を取得
       const toggleEditButton = document.getElementById('toggle-edit');
-      let isEditMode = false;
-      toggleEditButton.querySelector('i').className = 'fa fa-pen-to-square';
+      let isEditMode = false; // 初期状態で編集モードをオフに設定
 
+      // 編集モードオフに対応するアイコンを設定
+      toggleEditButton.querySelector('i').className = 'fa fa-eye';
+
+      // 編集モードのトグルボタンをクリックしたときの処理
       toggleEditButton.addEventListener('click', () => {
-        isEditMode = !isEditMode;
+        isEditMode = !isEditMode; // 編集モードの状態を反転
 
-        // Toggle icons for edit mode
+        // 編集モードに応じてアイコンを切り替え
         toggleEditButton.querySelector('i').className = isEditMode ? 'fa fa-pen-to-square' : 'fa fa-eye';
 
-        // Get all delete and sort buttons within memo items
+        // 各メモの削除ボタンとソートボタンを取得
         const deleteButtons = document.querySelectorAll('.memo-item .delete-button');
         const sortButtons = document.querySelectorAll('.memo-item .sort-button');
 
-        // Toggle visibility for delete and sort buttons
+        // 編集モードに応じて削除ボタンとソートボタンの表示/非表示を切り替え
         deleteButtons.forEach(button => button.classList.toggle('hidden', !isEditMode));
         sortButtons.forEach(button => button.classList.toggle('hidden', !isEditMode));
-      });   
+      });
+
+      // ページロード時に削除ボタンとソートボタンを非表示に設定
+      document.addEventListener('DOMContentLoaded', () => {
+        const deleteButtons = document.querySelectorAll('.memo-item .delete-button');
+        const sortButtons = document.querySelectorAll('.memo-item .sort-button');
+
+        deleteButtons.forEach(button => button.classList.add('hidden'));
+        sortButtons.forEach(button => button.classList.add('hidden'));
+      }); 
       
         // 全開閉トグル
         // tab-toggle ボタンをクリックして全てのメモを開閉する機能
@@ -799,27 +773,6 @@
             tabToggleButton.querySelector('i').className = 'fa-solid fa-angles-up';
           }
         });
-      
-        document.addEventListener('keydown', function(event) {
-            if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === '?') {
-                event.preventDefault();
-                alert("Markdown Shortcuts:\n" +
-                    "- # Heading 1\n" +
-                    "- ## Heading 2\n" +
-                    "- ### Heading 3\n" +
-                    "- **bold** or __bold__: Bold text\n" +
-                    "- *italic* or _italic_: Italic text\n" +
-                    "- > Blockquote\n" +
-                    "- - or * or +: Unordered List\n" +
-                    "- 1.: Ordered List\n" +
-                    "- [] or [x]: Task List\n" +
-                    "- --- or ***: Horizontal Line\n" +
-                    "- [Link Text](URL): Insert Link\n" +
-                    "- `Inline Code`: Inline Code\n" +
-                    "- ```Code Block```: Code Block");
-            }
-        });
-
       
       // メニュー機能終わり　●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●
 
@@ -895,10 +848,6 @@
             }
         });
 
-        // Markdownプラグインを適用
-        new QuillMarkdown(quill, {
-            // 必要に応じてオプションを追加
-        });
 
 
         // ツールバーを隠すコード　▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
@@ -976,3 +925,4 @@
     </script>
 
 </html>
+
