@@ -573,7 +573,7 @@
       });
 
 
-      // メニュー機能
+      // メニュー機能　●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●
       // Dark mode
       const button = document.getElementById('toggle-theme');
       button.addEventListener('click', function() {
@@ -583,6 +583,104 @@
       // ローカルストレージにメモを保存する関数
       //ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
       //ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
+      
+        // 保存ボタンでメモ内容をローカルストレージに保存する
+  document.getElementById('save-button').addEventListener('click', function() {
+    const memos = [];
+    document.querySelectorAll('.memo-item').forEach(memo => {
+      const title = memo.querySelector('.textbox').value;
+      const content = memo.querySelector('.quill-editor .ql-editor').innerHTML;
+      memos.push({ title, content });
+    });
+    localStorage.setItem('StickyMemo', JSON.stringify(memos));
+    alert('StickyMemo has been saved.');
+  });
+
+  // ページロード時にローカルストレージからメモを読み込む
+  document.addEventListener('DOMContentLoaded', function() {
+    const savedMemos = JSON.parse(localStorage.getItem('StickyMemo'));
+    if (savedMemos) {
+      savedMemos.forEach(memoData => {
+        // 新しいメモのコンテナを作成
+        const newMemo = document.createElement('div');
+        newMemo.classList.add('memo-item');
+
+        // 上部コンテナ (テキストボックスと削除ボタン　+　ソートボタン)
+        const memoHeader = document.createElement('div');
+        memoHeader.classList.add('memo-header');
+
+        // 開閉ボタン実装
+        const toggleIcon = document.createElement('i');
+        toggleIcon.classList.add('fa-solid', 'fa-caret-right', 'toggle-icon');
+        memoHeader.appendChild(toggleIcon);
+
+        // テキストボックスを追加
+        const inputElement = document.createElement('input');
+        inputElement.type = 'text';
+        inputElement.placeholder = 'Memo Title';
+        inputElement.classList.add('textbox');
+        inputElement.value = memoData.title;
+        memoHeader.appendChild(inputElement);
+
+        // 削除ボタンを追加
+        const deleteButton = document.createElement('button');
+        deleteButton.classList.add('delete-button');
+        deleteButton.innerHTML = '<i class="fa-solid fa-circle-minus"></i>';
+        deleteButton.addEventListener('click', function() {
+          newMemo.remove();
+        });
+        memoHeader.appendChild(deleteButton);
+
+        // ソートボタンを追加
+        const sortButton = document.createElement('button');
+        sortButton.classList.add('sort-button');
+        sortButton.innerHTML = '<i class="fa-solid fa-grip"></i>'; // ソートアイコン
+        memoHeader.appendChild(sortButton);
+
+        // メモコンテナにヘッダーを追加
+        newMemo.appendChild(memoHeader);
+
+        // Quill エディター全体のコンテナを追加
+        const editorWrapper = document.createElement('div');
+        editorWrapper.classList.add('editor-wrapper', 'hidden'); // 全体のコンテナを隠すクラス追加
+        newMemo.appendChild(editorWrapper);
+
+        // Quill エディターのコンテナを作成
+        const editorContainer = document.createElement('div');
+        editorContainer.classList.add('quill-editor');
+        editorWrapper.appendChild(editorContainer);
+
+        // コンテナに新しいメモを追加
+        document.getElementById('memo-container').appendChild(newMemo);
+
+        // Quill エディターを初期化
+        const quill = new Quill(editorContainer, {
+          theme: 'snow',
+          bounds: '#editor',
+          modules: {
+            toolbar: [
+              ['bold', 'italic'],      // Text styling
+              [{ 'color': [] }],
+              [{ 'list': 'ordered' }, { 'list': 'bullet' }],   // Lists
+              [{ 'indent': '-1' }, { 'indent': '+1' }],       // outdent/indent
+              ['link', 'image']
+            ]
+          }
+        });
+
+        // 保存された内容をエディターに設定
+        quill.root.innerHTML = memoData.content;
+
+        // "toggle-icon" のクリックで memo-item 開閉できるように
+        toggleIcon.addEventListener('click', function() {
+          const isHidden = editorWrapper.classList.contains('hidden');
+          toggleIcon.classList.toggle('fa-caret-right', !isHidden);
+          toggleIcon.classList.toggle('fa-caret-down', isHidden);
+          editorWrapper.classList.toggle('hidden');
+        });
+      });
+    }
+  });
       
       // ローカルストレージからメモを読み込む関数
       //ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
@@ -660,6 +758,8 @@
             tabToggleButton.querySelector('i').className = 'fa-solid fa-angles-up';
           }
         });
+      
+      // メニュー機能終わり　●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●
 
 
       // ▼▼▼▼▼▼▼▼▼▼▼　ここからメモコンテナを追加していくパート　▼▼▼▼▼▼▼▼▼▼
