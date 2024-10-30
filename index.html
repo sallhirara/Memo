@@ -706,6 +706,20 @@
 
       //　Reset All
       //ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
+      // Resetボタンのクリックイベント
+      document.getElementById('reset-button').addEventListener('click', function() {
+          // 確認アラートを表示し、OKが押された場合のみリセット処理を行う
+          const userConfirmed = confirm("Are you sure you want to reset all data? This action cannot be undone.");
+
+          if (userConfirmed) {
+              // ローカルストレージのデータをクリア
+              localStorage.removeItem('StickyMemo');
+
+              // ページをリロード
+              location.reload();
+          }
+      });
+
 
       //ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
 
