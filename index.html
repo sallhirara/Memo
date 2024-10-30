@@ -388,11 +388,11 @@
 
       // menuButton の初期位置設定
       function setInitialPosition() {
-        const margin = 10;
+        const margin = 15;
         const screenWidth = window.innerWidth;
         const screenHeight = window.innerHeight;
         menuButton.style.left = `${margin}px`;
-        menuButton.style.top = `${margin}px`;
+        menuButton.style.top = `${margin + 55 }px`;
       }
 
       setInitialPosition();
@@ -400,7 +400,20 @@
       // メニュースクリーンの中心をメニューボタンの中心に合わせる
       menuButton.addEventListener("click", () => {
         const buttonRect = menuButton.getBoundingClientRect();
-        const centerTop = buttonRect.top + buttonRect.height / 2;
+        let centerTop = buttonRect.top + buttonRect.height / 2;
+
+        // メニューコンテナの表示位置に制限を設定
+        const screenHeight = window.innerHeight;
+        const minTop = 200;  // 上端からの最小距離
+        const maxBottom = screenHeight - 200;  // 下端からの最小距離
+
+        // 表示位置を制限に従って調整
+        if (centerTop < minTop) {
+            centerTop = minTop;
+        } else if (centerTop > maxBottom) {
+            centerTop = maxBottom;
+        }
+
         menuScreen.style.top = `${centerTop}px`;
         menuScreen.style.left = "50%";
         menuScreen.style.display = menuScreen.style.display === "none" ? "flex" : "none";
@@ -495,6 +508,9 @@
               const toRight = screenWidth - rect.right;
 
               const minDistance = Math.min(toLeft, toRight);
+            
+              // 張り付く際のマージンを設定
+              const margin = 15;  // 張り付くときのマージンをここで設定
 
               if (minDistance === toLeft) {
                   menuButton.style.left = `${margin}px`;
