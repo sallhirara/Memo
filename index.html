@@ -679,9 +679,7 @@
             new QuillMarkdown(quill, {
                 // 必要に応じてオプションを追加
             });
-            
-            
-            
+              
             // Markdownプラグインを適用
             const markdownOptions = {}; // 必要に応じて設定を追加
             new QuillMarkdown(quill, markdownOptions);
@@ -697,24 +695,29 @@
               toggleIcon.classList.toggle('fa-caret-down', isHidden);
               editorWrapper.classList.toggle('hidden');
             });
-            
           });
         }
-        
-        // Editmodeをオフに設定ーーーーーーーーーーーーーーーーーーーー
-        isEditMode = false;
+      });      
 
-        // アイコンの状態を非編集モードに設定
-        toggleEditButton.querySelector('i').className = 'fa fa-eye';
+      // Editmodeをオフに設定ーーーーーーーーーーーーーーーーーーーー
+      document.addEventListener('DOMContentLoaded', function() {
+        // リロード後、Editmodeを必ずオフに設定
+        let isEditMode = false;
 
-        // メモアイテムの削除ボタンとソートボタンを非表示にする
+        // Editモードボタンのアイコンを「目のアイコン」に更新
+        const toggleEditButton = document.getElementById('toggle-edit');
+        if (toggleEditButton) {
+          toggleEditButton.querySelector('i').className = 'fa fa-eye'; // アイコンを更新してEditmodeオフを示す
+        }
+
+        // 削除ボタンとソートボタンを非表示にする
         const deleteButtons = document.querySelectorAll('.memo-item .delete-button');
         const sortButtons = document.querySelectorAll('.memo-item .sort-button');
-        deleteButtons.forEach(button => button.classList.add('hidden'));
-        sortButtons.forEach(button => button.classList.add('hidden'));
-        
-        // Editmodeをオフに設定ーーーーーーーーーーーーーーーーーーーー
+        deleteButtons.forEach(button => button.classList.add('hidden')); // 削除ボタンを非表示
+        sortButtons.forEach(button => button.classList.add('hidden'));  // ソートボタンを非表示
       });
+      // Editmodeをオフに設定ーーーーーーーーーーーーーーーーーーーー
+
       // ここまで　　ページロード時にローカルストレージからメモを読み込む
 
 
@@ -742,7 +745,7 @@
         
       // エディットモード　Toggle edit mode for delete and sort buttons
       const toggleEditButton = document.getElementById('toggle-edit');
-      let isEditMode = true;
+      let isEditMode = false;
       toggleEditButton.querySelector('i').className = 'fa fa-pen-to-square';
 
       toggleEditButton.addEventListener('click', () => {
