@@ -414,10 +414,30 @@
             centerTop = maxBottom;
         }
 
-        menuScreen.style.top = `${centerTop}px`;
-        menuScreen.style.left = "50%";
+        if (window.innerWidth >= 768) { // PCの場合 (768px以上の画面幅)
+          // メニューボタンの位置に基づいてメニュー画面の横位置を設定
+          let menuLeft;
+          if (buttonRect.left <= 150) { // メニューボタンが左端に張り付いている場合
+            menuLeft = buttonRect.right + 150;
+          } else if (window.innerWidth - buttonRect.right <= 150) { // メニューボタンが右端に張り付いている場合
+            menuLeft = buttonRect.left - 150 - menuScreen.offsetWidth;
+          } else { // それ以外の場合（中央位置など）
+            menuLeft = buttonRect.left + 150;
+          }
+
+          // 横位置を設定し、高さ位置は元の制限に従う
+          menuScreen.style.top = `${centerTop}px`;
+          menuScreen.style.left = `${menuLeft}px`;
+        } else {
+          // モバイルなどの場合は中央に表示
+          menuScreen.style.left = "50%";
+          menuScreen.style.top = `${centerTop}px`; // 高さ位置は保持
+        }
+
+        // メニューの表示切り替え
         menuScreen.style.display = menuScreen.style.display === "none" ? "flex" : "none";
       });
+
 
       // 画面リサイズ時の位置調整
       window.addEventListener("resize", () => {
