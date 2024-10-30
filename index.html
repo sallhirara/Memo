@@ -372,6 +372,9 @@
     <script src="scripts.js"></script> <!-- 外部JavaScriptファイルのリンク -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>  <!--for flatpickr-->
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>  <!--for quilleditor-->
+    <script src="https://cdn.jsdelivr.net/npm/quilljs-markdown@latest/dist/quilljs-markdown.min.js"></script>
+<!--for quilleditor Markdown plagin-->
+
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script> <!--for sortable-->
 
 
@@ -667,9 +670,22 @@
                   [{ 'list': 'ordered' }, { 'list': 'bullet' }],   // Lists
                   [{ 'indent': '-1' }, { 'indent': '+1' }],       // outdent/indent
                   ['link', 'image']
-                ]
+                ],
+                markdownShortcuts: {}  // Markdownショートカットを追加
               }
             });
+            
+            // Markdownプラグインを適用
+            new QuillMarkdown(quill, {
+                // 必要に応じてオプションを追加
+            });
+            
+            
+            
+            // Markdownプラグインを適用
+            const markdownOptions = {}; // 必要に応じて設定を追加
+            new QuillMarkdown(quill, markdownOptions);
+            
 
             // 保存された内容をエディターに設定
             quill.root.innerHTML = memoData.content;
@@ -781,6 +797,27 @@
           }
         });
       
+        document.addEventListener('keydown', function(event) {
+            if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === '?') {
+                event.preventDefault();
+                alert("Markdown Shortcuts:\n" +
+                    "- # Heading 1\n" +
+                    "- ## Heading 2\n" +
+                    "- ### Heading 3\n" +
+                    "- **bold** or __bold__: Bold text\n" +
+                    "- *italic* or _italic_: Italic text\n" +
+                    "- > Blockquote\n" +
+                    "- - or * or +: Unordered List\n" +
+                    "- 1.: Ordered List\n" +
+                    "- [] or [x]: Task List\n" +
+                    "- --- or ***: Horizontal Line\n" +
+                    "- [Link Text](URL): Insert Link\n" +
+                    "- `Inline Code`: Inline Code\n" +
+                    "- ```Code Block```: Code Block");
+            }
+        });
+
+      
       // メニュー機能終わり　●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●
 
 
@@ -855,6 +892,10 @@
             }
         });
 
+        // Markdownプラグインを適用
+        new QuillMarkdown(quill, {
+            // 必要に応じてオプションを追加
+        });
 
 
         // ツールバーを隠すコード　▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
