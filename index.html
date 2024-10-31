@@ -373,7 +373,8 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>  <!--for flatpickr-->
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>  <!--for quilleditor-->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script> <!--for sortable-->
-
+    <script src="https://cdn.jsdelivr.net/npm/quilljs-markdown@latest/dist/quilljs-markdown.min.js"></script>
+<!--for quilleditor Markdown plagin-->
 
   
     <script>
@@ -670,7 +671,32 @@
               }
             });
 
+            // Markdownプラグインを適用ーーーーーーーーーー
             
+            const markdownOptions = {
+              syntax: true,  // シンタックスハイライトを有効にする
+              shortcuts: {
+                bold: '**',  // 太字のショートカットとして '**' を使用
+                italic: '_',  // 斜体のショートカットとして '_' を使用
+                strikethrough: '~~'  // 取り消し線のショートカットとして '~~' を使用
+              },
+              custom: {
+                strikethrough: '~~'  // カスタムで取り消し線を '~~' と設定
+              },
+              enableFormats: ['bold', 'italic', 'link', 'blockquote', 'list'],  // 有効にするMarkdownのフォーマット
+              customHandlers: {
+                hashtag: function(quill, options) {
+                  console.log('Hashtag entered!');  // '#' を使った時のカスタム動作
+                }
+              },
+              blockquote: true,  // 引用ブロックを有効にする
+              lists: true  // リストを有効にする
+            };
+            new QuillMarkdown(quill, markdownOptions);
+            
+            // Markdownプラグインを適用ーーーーーーーーーー
+
+
             // ツールバーを隠すコード　▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
 
             // フォーカス時にツールバーを表示
@@ -899,8 +925,33 @@
             }
         });
 
+        // Markdownプラグインを適用ーーーーーーーーーー
+        
+        const markdownOptions = {
+          syntax: true,  // シンタックスハイライトを有効にする
+          shortcuts: {
+            bold: '**',  // 太字のショートカットとして '**' を使用
+            italic: '_',  // 斜体のショートカットとして '_' を使用
+            strikethrough: '~~'  // 取り消し線のショートカットとして '~~' を使用
+          },
+          custom: {
+            strikethrough: '~~'  // カスタムで取り消し線を '~~' と設定
+          },
+          enableFormats: ['bold', 'italic', 'link', 'blockquote', 'list'],  // 有効にするMarkdownのフォーマット
+          customHandlers: {
+            hashtag: function(quill, options) {
+              console.log('Hashtag entered!');  // '#' を使った時のカスタム動作
+            }
+          },
+          blockquote: true,  // 引用ブロックを有効にする
+          lists: true  // リストを有効にする
+        };
+        new QuillMarkdown(quill, markdownOptions);
+        
+        // Markdownプラグインを適用ーーーーーーーーーー
 
 
+        
         // ツールバーを隠すコード　▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
 
         // フォーカス時にツールバーを表示
