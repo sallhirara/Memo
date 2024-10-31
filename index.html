@@ -670,6 +670,57 @@
               }
             });
 
+            
+            // ツールバーを隠すコード　▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
+
+            // フォーカス時にツールバーを表示
+            quill.root.addEventListener('focus', function() {
+                const toolbar = editorContainer.previousElementSibling; // エディターの直前にあるツールバーを取得
+                if (toolbar) {
+                    toolbar.style.display = 'flex';
+                    toolbar.style.justifyContent = 'center';
+                }
+            });
+
+            // クリックした場所がツールバーやエディタ内でなければツールバーを非表示にする
+            document.addEventListener('click', function(event) {
+                const toolbar = editorContainer.previousElementSibling; // エディターの直前にあるツールバーを取得
+                const editor = editorContainer.querySelector('.ql-editor');
+
+                // クリックした場所がツールバーやエディタ内でない場合、ツールバーを非表示にする
+                if (toolbar && editor && !toolbar.contains(event.target) && !editor.contains(event.target)) {
+                    toolbar.style.display = 'none';
+                }
+            });
+
+            // リンク挿入機能
+            quill.getModule('toolbar').addHandler('link', function() {
+                const value = prompt('Enter the link URL');
+                if (value) {
+                    quill.format('link', value);  // リンクを挿入
+                }
+            });
+
+            // 選択範囲に基づくポップアップ位置の調整
+            quill.on('selection-change', (range) => {
+                if (range) {
+                    const bounds = quill.getBounds(range);
+                    const popup = document.querySelector('.your-popup-selector'); // ポップアップのセレクタを適宜置き換えてください
+                    if (popup) {
+                        popup.style.top = `${bounds.top - 30}px`; // テキストの上に配置
+                        popup.style.left = `50%`; // 中央に配置
+                        popup.style.display = 'block'; // ポップアップを表示
+                    }
+                } else {
+                    const popup = document.querySelector('.your-popup-selector'); // ポップアップのセレクタを適宜置き換えてください
+                    if (popup) {
+                        popup.style.display = 'none'; // 選択が解除されたら非表示
+                    }
+                }
+            });
+
+            //　ここまでツールバーを隠すコード　▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
             // 保存された内容をエディターに設定
             quill.root.innerHTML = memoData.content;
 
